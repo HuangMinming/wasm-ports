@@ -44,9 +44,9 @@ void outputBytes(ostream &os, vector<uint8_t> v) {
     for (auto el : v) os << el;
 }
 
-ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-endif
+#endif
 
 void EMSCRIPTEN_KEEPALIVE myFunction() {
     cout << "Pairing start" << endl;
@@ -92,7 +92,9 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
 }
 
 
-ifdef __cplusplus
+#ifdef __cplusplus
+}
+#endif
 
 
 
