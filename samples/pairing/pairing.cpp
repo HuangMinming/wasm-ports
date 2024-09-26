@@ -97,7 +97,7 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
 }
 #endif
 
-
+pairing_t pairing;
 
 
 int main(int argc, char **argv) {
