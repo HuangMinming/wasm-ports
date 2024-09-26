@@ -45,6 +45,7 @@ void outputBytes(ostream &os, vector<uint8_t> v) {
 
 int main(int argc, char **argv) {
 
+    cout << "Pairing start" << endl;
     std::ifstream file("input.data", std::ios::binary);
 
     vector<uint8_t> v1 = readBytes(file, 32);
@@ -82,5 +83,7 @@ int main(int argc, char **argv) {
     ofile.close();
 
     cout << ans.c0.c0.c0.size_in_bits() << ", " << x.N << endl;
+
+    cout << "Pairing finish" << endl;
 }
 
