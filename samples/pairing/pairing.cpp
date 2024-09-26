@@ -8,6 +8,9 @@
 #include <fstream>
 #include <emscripten/emscripten.h>
 #include <pbc/pbc.h>
+#include <pbc/pbc_param.h>
+#include <pbc/pbc_pairing.h>
+
 
 using namespace libff;
 using namespace std;
