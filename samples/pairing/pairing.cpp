@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <fstream>
 #include <emscripten/emscripten.h>
+#include <pbc.h>
 
 using namespace libff;
 using namespace std;
