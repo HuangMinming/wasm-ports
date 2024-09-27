@@ -2,9 +2,13 @@
 
 em++ -O2 -c pairing.cpp -s WASM=1 -I $EMSCRIPTEN/system/include -std=c++11
 em++ pairing.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o pairing.js -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s ENVIRONMENT='web,worker'
-#em++ pairing.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o pairing.js -sEXPORTED_FUNCTIONS=_myFunction -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -sMODULARIZE
 node ~/emscripten-module-wrapper/prepare.js pairing.js --debug --out dist --file _dev_urandom --file input.data --file output.data --upload-ipfs --analyze --run
 cp dist/globals.wasm task.wasm
 cp dist/info.json .
 solc --overwrite --bin --abi --optimize contract.sol -o build
+
+#manual call
+#em++ -O2 -c pairing.cpp -s WASM=1 -I $EMSCRIPTEN/system/include -std=c++11
+#em++ pairing.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o pairing.js -sEXPORTED_FUNCTIONS=_myFunction -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -s MODULARIZE=1
+
 

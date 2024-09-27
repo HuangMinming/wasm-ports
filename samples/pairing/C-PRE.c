@@ -10,8 +10,8 @@ int main(int argc, char ** argv) {
 extern "C" {
 #endif
 
-int EMSCRIPTEN_KEEPALIVE myFunction(int argc, char ** argv) {
-  printf("我的函数已被调用\n");
+int EMSCRIPTEN_KEEPALIVE pbc_test1(int argc, char ** argv) {
+  printf("call pbc_test1\n");
   return 0;
 }
 
