@@ -52,6 +52,7 @@ void outputBytes(ostream &os, vector<uint8_t> v) {
 extern "C" {
 #endif
 
+
 void EMSCRIPTEN_KEEPALIVE myFunction() {
     cout << "Pairing start" << endl;
     std::ifstream file("input.data", std::ios::binary);
@@ -99,6 +100,7 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
 #ifdef __cplusplus
 }
 #endif
+
 
 pairing_t pairing;
 
