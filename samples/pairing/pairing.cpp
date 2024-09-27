@@ -105,9 +105,63 @@ void EMSCRIPTEN_KEEPALIVE anotherFunction() {
 #endif
 
 
+pairing_t pairing;
+
+
 int main(int argc, char **argv) {
 
-    cout << "main()" << endl;
-    return 0;
+    cout << "param_str start" << endl;
+    char param_str[] = "type a\n"
+                       "q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\n"
+                       "h 12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776\n"
+                       "r 730750818665451621361119245571504901405976559617\n"
+                       "exp2 159\n"
+                       "exp1 107\n"
+                       "sign1 1\n"
+                       "sign0 1";
+    pbc_param_t par;
+    pbc_param_init_set_str(par, param_str);
+    pairing_init_pbc_param(pairing, par);
+    cout << "param_str finish" << endl;
+    cout << "Pairing start" << endl;
+    std::ifstream file("input.data", std::ios::binary);
+
+    vector<uint8_t> v1 = readBytes(file, 32);
+    vector<uint8_t> v2 = readBytes(file, 32);
+    alt_bn128_pp::init_public_params();
+    cout << "V1 " << v1 << endl;
+    cout << "V2 " << v2 << endl;
+    G1<alt_bn128_pp> P = readElem<alt_bn128_pp>(v1) * G1<alt_bn128_pp>::one();
+    G2<alt_bn128_pp> Q = readElem<alt_bn128_pp>(v2) * G2<alt_bn128_pp>::one();
+    P.print();
+    Q.print();
+    GT<alt_bn128_pp> ans = alt_bn128_pp::reduced_pairing(P, Q);
+    // ans.print();
+    auto x = ans.c0.c0.c0.as_bigint();
+    x.print();
+    x.print_hex();
+
+    std::ofstream ofile("output.data", std::ios::binary);
+    gmp_printf("%Nx\n", x.data, x.N);
+
+    vector<uint8_t> ovec(x.N*4);
+    for (int i = x.N-1; i >= 0; i--) {
+        int a = x.data[i];
+        cout << hex << a << endl;
+        for (int j = 0; j < 4; j++) {
+            ovec[(x.N-1-i)*4 + 4 - j - 1] = (uint8_t)(a&0xff);
+            a = a >> 8;
+        }
+    }
+
+    for (auto el : ovec) cout << hex << (int)el << endl;
+
+    outputBytes(ofile, ovec);
+
+    ofile.close();
+
+    cout << ans.c0.c0.c0.size_in_bits() << ", " << x.N << endl;
+
+    cout << "Pairing finish" << endl;
 }
 
