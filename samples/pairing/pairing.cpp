@@ -96,7 +96,7 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
     cout << "Pairing finish" << endl;
 }
 
-void EMSCRIPTEN_KEEPALIVE myFunction2() {
+void EMSCRIPTEN_KEEPALIVE anotherFunction() {
     cout << "Are you ok?" <<endl;
 }
 
