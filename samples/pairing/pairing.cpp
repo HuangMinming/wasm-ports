@@ -96,6 +96,9 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
     cout << "Pairing finish" << endl;
 }
 
+void EMSCRIPTEN_KEEPALIVE myFunction2() {
+    cout << "Are you ok?" <<endl;
+}
 
 #ifdef __cplusplus
 }
