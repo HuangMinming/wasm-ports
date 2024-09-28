@@ -94,10 +94,11 @@ void EMSCRIPTEN_KEEPALIVE myFunction() {
     cout << ans.c0.c0.c0.size_in_bits() << ", " << x.N << endl;
 
     cout << "Pairing finish" << endl;
+    cout << "myFunction" <<endl;
 }
 
 void EMSCRIPTEN_KEEPALIVE anotherFunction() {
-    cout << "Are you ok?" <<endl;
+    cout << "anotherFunction" <<endl;
 }
 
 #ifdef __cplusplus
