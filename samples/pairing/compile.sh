@@ -11,7 +11,7 @@ solc --overwrite --bin --abi --optimize contract.sol -o build
 #em++ -O2 -c pairing.cpp -s WASM=1 -I $EMSCRIPTEN/system/include -std=c++11
 #em++ pairing.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o pairing.js -s EXPORTED_FUNCTIONS='["_myFunction", "_anotherFunction"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s MODULARIZE=1 -s EXIT_RUNTIME=1 -s NO_EXIT_RUNTIME=0
 
+
 # em++ -O2 -c C-PRE.c sha256.c -s WASM=1 -I $EMSCRIPTEN/system/include -std=c++11
 # em++ C-PRE.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o C-PRE.js -s EXPORTED_FUNCTIONS='["_Enc1Test", "_Enc2Test", "_ReEncTest"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s MODULARIZE=1 -s EXIT_RUNTIME=1 -s NO_EXIT_RUNTIME=0
 # em++ C-PRE.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o C-PRE.js
-
