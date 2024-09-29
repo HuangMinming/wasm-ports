@@ -509,6 +509,7 @@ void random_bitstring(char *bitstring, int n) {
 
 int main()
 {
+  printf("main start\n");
   // 加密系统初始化
   Setup(50);//设置n的大小
 
@@ -520,5 +521,6 @@ int main()
   element_clear(g);
   element_clear(Z);
   pairing_clear(pairing);
+  printf("main finish\n");
   return 0;
 }
