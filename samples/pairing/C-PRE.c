@@ -506,3 +506,19 @@ void random_bitstring(char *bitstring, int n) {
     }
     bitstring[n] = '\0'; 
 }
+
+int main()
+{
+  // 加密系统初始化
+  Setup(50);//设置n的大小
+
+  Enc1Test();
+  Enc2Test();
+  ReEncTest();
+
+  
+  element_clear(g);
+  element_clear(Z);
+  pairing_clear(pairing);
+  return 0;
+}
