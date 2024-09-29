@@ -5,6 +5,7 @@
 #include <string.h>
 // #include "/usr/local/include/pbc/pbc.h"
 #include <pbc/pbc.h>
+#include <emscripten/emscripten.h>
 
 
 extern pairing_t pairing;
