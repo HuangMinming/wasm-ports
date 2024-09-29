@@ -50,8 +50,8 @@ void bytes_to_bits(unsigned char* bytes, int byte_len, char* bitstring, int n);
 void xor_bitstrings(char* result, char* str1, char* str2);
 void random_bitstring(char *bitstring, int n);
 //测试函数
-void Enc1Test();
-void Enc2Test();
-void ReEncTest();
+void EMSCRIPTEN_KEEPALIVE Enc1Test();
+void EMSCRIPTEN_KEEPALIVE Enc2Test();
+void EMSCRIPTEN_KEEPALIVE ReEncTest();
 
 #endif // C-PRE_H
