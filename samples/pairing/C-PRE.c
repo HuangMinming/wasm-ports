@@ -8,6 +8,7 @@
 #include <pbc/pbc.h>
 #include <string.h>
 #include "sha256.h"
+#include "C-PRE.h"
 
 
 pairing_t pairing;
