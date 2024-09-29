@@ -511,11 +511,21 @@ int main()
 {
   printf("main start\n");
   // 加密系统初始化
+  printf("Setup start\n");
   Setup(50);//设置n的大小
+  printf("Setup finish\n");
 
+  printf("Enc1Test start\n");
   Enc1Test();
+  printf("Enc1Test finish\n");
+
+  printf("Enc2Test start\n");
   Enc2Test();
+  printf("Enc2Test finish\n");
+
+  printf("ReEncTest start\n");
   ReEncTest();
+  printf("ReEncTest finish\n");
 
   
   element_clear(g);
