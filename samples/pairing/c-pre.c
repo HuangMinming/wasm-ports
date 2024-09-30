@@ -1,8 +1,3 @@
-// #include <libff/algebra/curves/edwards/edwards_pp.hpp>
-// #include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
-// #include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-// #include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
-
 #include <stdio.h>
 #include <emscripten/emscripten.h>
 #include <pbc/pbc.h>
@@ -475,6 +470,35 @@ void EMSCRIPTEN_KEEPALIVE ReEncTest()
         printf("ReEncTest fail\n");
     }
     printf("-----------End RecEncTest----------\n");
+}
+
+
+void main_test()
+{
+  printf("main_test start\n");
+  // 加密系统初始化
+  printf("Setup start\n");
+  Setup(50);//设置n的大小
+  printf("Setup finish\n");
+
+  printf("Enc1Test start\n");
+  Enc1Test();
+  printf("Enc1Test finish\n");
+
+  printf("Enc2Test start\n");
+  Enc2Test();
+  printf("Enc2Test finish\n");
+
+  printf("ReEncTest start\n");
+  ReEncTest();
+  printf("ReEncTest finish\n");
+
+  
+  element_clear(g);
+  element_clear(Z);
+  pairing_clear(pairing);
+  printf("main_test finish\n");
+  return 0;
 }
 
 
