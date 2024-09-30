@@ -1,6 +1,6 @@
-// C-PRE.h
-#ifndef C-PRE_H
-#define C-PRE_H
+// c_pre.h
+#ifndef C_PRE_H 
+#define C_PRE_H 
 #include <stdio.h>
 #include <string.h>
 // #include "/usr/local/include/pbc/pbc.h"
