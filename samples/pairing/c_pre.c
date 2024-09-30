@@ -473,7 +473,7 @@ void EMSCRIPTEN_KEEPALIVE ReEncTest()
 }
 
 
-void main_test()
+void EMSCRIPTEN_KEEPALIVE main_test()
 {
   printf("main_test start\n");
   // 加密系统初始化
