@@ -498,7 +498,7 @@ void main_test()
   element_clear(Z);
   pairing_clear(pairing);
   printf("main_test finish\n");
-  return 0;
+
 }
 
 
