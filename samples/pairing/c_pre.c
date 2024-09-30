@@ -501,6 +501,12 @@ void EMSCRIPTEN_KEEPALIVE main_test()
 
 }
 
+int EMSCRIPTEN_KEEPALIVE keyGenTest(char *key) {
+    const char *my_string = "Hello from C!";
+    memcpy(array, my_string, strlen(my_string));
+    return 0;
+}
+
 
 
 #ifdef __cplusplus
