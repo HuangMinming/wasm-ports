@@ -1,7 +1,7 @@
-#include <libff/algebra/curves/edwards/edwards_pp.hpp>
-#include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
-#include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+// #include <libff/algebra/curves/edwards/edwards_pp.hpp>
+// #include <libff/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
+// #include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+// #include <libff/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
 
 #include <stdio.h>
 #include <emscripten/emscripten.h>
@@ -9,6 +9,7 @@
 #include <string.h>
 #include "sha256.h"
 #include "C-PRE.h"
+#include <time.h>
 
 
 pairing_t pairing;
