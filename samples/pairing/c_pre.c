@@ -501,16 +501,16 @@ void EMSCRIPTEN_KEEPALIVE main_test()
 
 }
 
-char* EMSCRIPTEN_KEEPALIVE keyGenTest(char *inArray, int inLen, char *outArray, int outLen) {
-    printf("inLen=%d", inLen);
+char* EMSCRIPTEN_KEEPALIVE keyGenTest(char *inArray, int inLen, char *outArray, int *outLen) {
+    printf("inLen=%d\n", inLen);
     for(int i=0;i<inLen;i++) {
         printf("%02x", inArray[i]);
     }
     printf("\n");
-    const char *my_string = "Hello from C!";
-    outLen = strlen(my_string);
-    memcpy(outArray, my_string, strlen(my_string));
-    printf("outLen=%d\n", outLen);
+    const char *my_string = "1234567abcdefg";
+    (*outLen) = strlen(my_string);
+    memcpy(outArray, my_string, (*outLen));
+    printf("outLen=%d\n", (*outLen));
     return outArray;
 }
 
