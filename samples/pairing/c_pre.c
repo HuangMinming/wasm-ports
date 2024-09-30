@@ -3,7 +3,7 @@
 #include <pbc/pbc.h>
 #include <string.h>
 #include "sha256.h"
-#include "c-pre.h"
+#include "c_pre.h"
 #include <time.h>
 
 
