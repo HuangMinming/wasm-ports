@@ -17,5 +17,8 @@ solc --overwrite --bin --abi --optimize contract.sol -o build
 # em++ c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -std=c++11 -o c_pre.js
 
 emcc -O2 -c c_pre.c sha256.c -s WASM=1 -I $EMSCRIPTEN/system/include
-emcc c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js -s EXPORTED_FUNCTIONS='["_Enc1Test", "_Enc2Test", "_ReEncTest", "_main_test"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s MODULARIZE=1 -s EXIT_RUNTIME=1 -s NO_EXIT_RUNTIME=0
+emcc c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js -s EXPORTED_FUNCTIONS='["_Enc1Test", "_Enc2Test", "_ReEncTest", "_main_test", "_keyGenTest"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s MODULARIZE=1 -s EXIT_RUNTIME=1 -s NO_EXIT_RUNTIME=0
 emcc c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js
+
+
+emcc c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js -s EXPORTED_FUNCTIONS='["_Enc1Test", "_Enc2Test", "_ReEncTest", "_main_test", "_keyGenTest", "_malloc", "_free", "ccall", "allocate", "UTF8ToString"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap"]' -s MODULARIZE=1 -s EXIT_RUNTIME=1 -s NO_EXIT_RUNTIME=0
