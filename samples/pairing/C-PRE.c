@@ -8,7 +8,7 @@
 #include <pbc/pbc.h>
 #include <string.h>
 #include "sha256.h"
-#include "C-PRE.h"
+#include "c-pre.h"
 #include <time.h>
 
 
