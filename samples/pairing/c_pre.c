@@ -501,14 +501,14 @@ void EMSCRIPTEN_KEEPALIVE main_test()
 
 }
 
-char * EMSCRIPTEN_KEEPALIVE keyGenTest(char *array) {
+char* EMSCRIPTEN_KEEPALIVE keyGenTest(char *inArray, char *outArray) {
     for(int i=0;i<2;i++) {
-        printf("%02x", array[i]);
+        printf("%02x", inArray[i]);
     }
     printf("\n");
     const char *my_string = "Hello from C!";
-    memcpy(array, my_string, strlen(my_string));
-    return array;
+    memcpy(outArray, my_string, strlen(my_string));
+    return outArray;
 }
 
 
