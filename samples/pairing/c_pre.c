@@ -212,7 +212,8 @@ ReKeyPair ReKeyGen(element_t ski, char* w, element_t pkj, element_t pki) //pki�
     element_random(s);
     Hash2(hashresult, pki, w);
     element_pow_zn(powresult, pkj, s);
-    element_mul(rk_ij.rk1, powresult, hashresult);
+    // element_mul(rk_ij.rk1, powresult, hashresult);
+    element_mul(rk_ij.rk1, hashresult, powresult);
     element_neg(negski, ski);
     element_pow_zn(rk_ij.rk1, rk_ij.rk1, negski);
     element_pow_zn(rk_ij.rk2, pki, s);
@@ -309,6 +310,28 @@ char* Dec2(CipherText CipherText, element_t sk, element_t pk, char* w)
     Hash3(hash3result, R);
     char *m = (char *) malloc(n + 1);
     xor_bitstrings(m, CipherText.c3, hash3result);
+
+    //verify g^H1(m, R) == C1
+    element_t hash1result;
+    element_init_Zr(hash1result, pairing);
+    Hash1(hash1result, m, R); 
+    element_t C1_2;
+    element_init_G1(C1_2, pairing);
+    element_pow_zn(C1_2, g, hash1result);
+    if (element_cmp(C1_2, C1) != 0) {
+        printf("双线性对检查失败，返回 NULL 密文\n");
+        element_clear(hash1result);
+        element_clear(C1_2);
+        element_clear(hash2result);
+        element_clear(eresult);
+        element_clear(R);
+        free(hash3result);
+        // 处理错误，或返回 ⊥
+        return NULL;
+    }
+    printf("双线性对检查通过\n");
+
+
     element_clear(hash2result);
     element_clear(eresult);
     element_clear(R);
