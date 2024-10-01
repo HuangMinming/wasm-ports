@@ -511,7 +511,6 @@ char* EMSCRIPTEN_KEEPALIVE keyGenTest(char *inArray, int inLen, char *outArray, 
     (*outLen) = strlen(my_string);
     memcpy(outArray, my_string, (*outLen));
     printf("outLen=%d\n", (*outLen));
-    (*outLen) = 65536*16;
     return outArray;
 }
 
