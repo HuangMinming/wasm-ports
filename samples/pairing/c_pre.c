@@ -25,7 +25,7 @@ sign0 1";
     pairing_init_set_buf(pairing, param, count);
     element_init_G1(g, pairing);
     // element_random(g);
-    element_set_si(g, 31415926);
+    element_from_hash(g, "31415926", strlen("31415926"));
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
     (*p_n) = 50;
