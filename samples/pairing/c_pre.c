@@ -167,6 +167,14 @@ int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
     KeyPair keypair;
     Setup(pairing, g, Z, &n);
 
+    unsigned char g_data[1024];
+    size_t g_len = element_length_in_bytes(g);
+    printf("g_len = %d, g=\n", g_len);
+    for(int i=0;i<g_len;i++){
+        printf("%02x ", g[i])
+    }
+    printf("\n");
+
     printf("n=%d\n", n);
 
     element_init_G1(keypair.pk, pairing);
@@ -185,6 +193,12 @@ int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
 
     memcpy(pk, pk_data, (*p_pk_len));
     memcpy(sk, sk_data, (*p_sk_len));
+
+    printf("(*p_pk_len) = %d, pk_data=\n", g_len);
+    for(int i=0;i<(*p_pk_len);i++){
+        printf("%02x ", pk_data[i])
+    }
+    printf("\n");
 
     return 0;
 }
