@@ -7,7 +7,7 @@
 #include <time.h>
 
 
-void Setup(pairing_t pairing, element_t g, element_t Z, int &n)
+void Setup(pairing_t pairing, element_t g, element_t Z, int *p_n)
 {
     char *param="type a\n\
 q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\n\
@@ -28,7 +28,7 @@ sign0 1";
     element_set_si(g, 31415926);
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
-    n = 50;
+    (*p_n) = 50;
 
     
 }
@@ -165,7 +165,9 @@ int KeyGen(char *pk, int *p_pk_len, char *sk, int *p_sk_len)
     element_t Z;
     int n;
     KeyPair keypair;
-    Setup(pairing, g, Z, n);
+    Setup(pairing, g, Z, &n);
+
+    printf("n=%d", n);
 
     element_init_G1(keypair.pk, pairing);
     element_init_Zr(keypair.sk, pairing);
