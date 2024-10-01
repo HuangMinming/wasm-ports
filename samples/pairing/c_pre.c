@@ -158,7 +158,7 @@ sign0 1";
 
 // }
 
-int KeyGen(char *pk, int *p_pk_len, char *sk, int *p_sk_len)
+int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
 {
     pairing_t pairing;
     element_t g;
@@ -601,8 +601,8 @@ int main() {
 
     unsigned char pk[1024];
     unsigned char sk[1024];
-    size_t pk_len;
-    size_t sk_len;
+    int pk_len;
+    int sk_len;
     KeyGen(pk, &pk_len, sk, &sk_len);
 
     printf("pk_len = %d, pk=%s\n", pk_len, pk);
