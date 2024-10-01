@@ -8,10 +8,10 @@
 #include <emscripten/emscripten.h>
 
 
-extern pairing_t pairing;
-extern element_t g;
-extern int n;
-extern element_t Z;
+// extern pairing_t pairing;
+// extern element_t g;
+// extern int n;
+// extern element_t Z;
 
 // 结构体定义
 typedef struct {
@@ -35,30 +35,22 @@ typedef struct {
 // 函数声明
 void Setup(int nlength);
 void Hash1(element_t result, char* m, element_t R);
-void Hash1Test();
 void Hash2(element_t result, element_t pk, char* w);
-void Hash2Test();
 void Hash3(char* bitstring, element_t R);
 void Hash4(element_t result, element_t c1, element_t c2, char* c3);
-KeyPair KeyGen();
-ReKeyPair ReKeyGen(element_t ski, char* w, element_t pkj, element_t pki);
-CipherText Enc1(element_t pk, char* m);
-CipherText Enc2(element_t pk, char* w, char* m);
-char* Dec1(CipherText CT, element_t sk, element_t pk);
-char* Dec2(CipherText CT, element_t sk, element_t pk, char* w);
-CipherText ReEnc(CipherText CT_i, ReKeyPair rekeypair);
-void bytes_to_bits(unsigned char* bytes, int byte_len, char* bitstring, int n);
-void xor_bitstrings(char* result, char* str1, char* str2);
-void random_bitstring(char *bitstring, int n);
+
+// void bytes_to_bits(unsigned char* bytes, int byte_len, char* bitstring, int n);
+// void xor_bitstrings(char* result, char* str1, char* str2);
+// void random_bitstring(char *bitstring, int n);
 //测试函数
-#ifdef __cplusplus
-extern "C" {
-#endif
-void EMSCRIPTEN_KEEPALIVE Enc1Test();
-void EMSCRIPTEN_KEEPALIVE Enc2Test();
-void EMSCRIPTEN_KEEPALIVE ReEncTest();
-#ifdef __cplusplus
-}
-#endif
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+// void EMSCRIPTEN_KEEPALIVE Enc1Test();
+// void EMSCRIPTEN_KEEPALIVE Enc2Test();
+// void EMSCRIPTEN_KEEPALIVE ReEncTest();
+// #ifdef __cplusplus
+// }
+// #endif
 
 #endif // C-PRE_H
