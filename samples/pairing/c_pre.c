@@ -37,6 +37,14 @@ sign0 1";
         printf("%02x ", g_data[i]);
     }
     printf("\n");
+    unsigned char Z_data[1024];
+    size_t Z_len = element_length_in_bytes(Z);
+    element_to_bytes(Z_data, Z);
+    printf("Z_len = %d, Z=\n", Z_len);
+    for(int i=0;i<Z_len;i++){
+        printf("%02x ", Z_data[i]);
+    }
+    printf("\n");
 
     
 }
