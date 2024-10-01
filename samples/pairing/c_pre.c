@@ -318,7 +318,7 @@ char* Dec2(CipherText CipherText, element_t sk, element_t pk, char* w)
     element_t C1_2;
     element_init_G1(C1_2, pairing);
     element_pow_zn(C1_2, g, hash1result);
-    if (element_cmp(C1_2, C1) != 0) {
+    if (element_cmp(C1_2, CipherText.c1) != 0) {
         printf("双线性对检查失败，返回 NULL 密文\n");
         element_clear(hash1result);
         element_clear(C1_2);
