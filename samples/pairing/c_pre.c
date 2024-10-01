@@ -167,7 +167,7 @@ int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
     KeyPair keypair;
     Setup(pairing, g, Z, &n);
 
-    printf("n=%d", n);
+    printf("n=%d\n", n);
 
     element_init_G1(keypair.pk, pairing);
     element_init_Zr(keypair.sk, pairing);
@@ -605,8 +605,16 @@ int main() {
     int sk_len;
     KeyGen(pk, &pk_len, sk, &sk_len);
 
-    printf("pk_len = %d, pk=%s\n", pk_len, pk);
-    printf("sk_len = %d, sk=%s\n", sk_len, sk);
+    printf("pk_len = %d, pk=\n", pk_len);
+    for(int i=0;i<pk_len;i++) {
+        printf("%02x ", pk[i]);
+    }
+    printf("\n");
+    printf("sk_len = %d, sk=\n", sk_len);
+    for(int i=0;i<sk_len;i++) {
+        printf("%02x ", sk[i]);
+    }
+    printf("\n");
 
 
     return 0;
