@@ -28,6 +28,8 @@ sign0 1";
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
     n = 50;
+
+    
 }
 
 // //Hash1 {0,1}* -> Zq
@@ -155,7 +157,7 @@ sign0 1";
 
 // }
 
-int KeyGen(char *pk, int *pk_len, char *sk, int *sk_len)
+int KeyGen(char *pk, int *p_pk_len, char *sk, int *p_sk_len)
 {
     pairing_t pairing;
     element_t g;
@@ -175,11 +177,11 @@ int KeyGen(char *pk, int *pk_len, char *sk, int *sk_len)
     unsigned char pk_data[1024];
     unsigned char sk_data[1024];
 
-    (*pk_len) = element_to_bytes(pk_data, keypair.pk);
-    (*sk_len) = element_to_bytes(sk_data, keypair.sk);
+    (*p_pk_len) = element_to_bytes(pk_data, keypair.pk);
+    (*p_sk_len) = element_to_bytes(sk_data, keypair.sk);
 
-    memcpy(pk, pk_data, (*pk_len));
-    memcpy(sk, sk_data, (*sk_len));
+    memcpy(pk, pk_data, (*p_pk_len));
+    memcpy(sk, sk_data, (*p_sk_len));
 
     return 0;
 }
