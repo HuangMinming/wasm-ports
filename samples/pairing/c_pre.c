@@ -507,7 +507,7 @@ char* EMSCRIPTEN_KEEPALIVE keyGenTest(char *inArray, int inLen, char *outArray, 
         printf("%02x", inArray[i]);
     }
     printf("\n");
-    const char *my_string = "1234567abcdefg";
+    const char *my_string = "12345\07abcdefg";
     (*outLen) = strlen(my_string);
     memcpy(outArray, my_string, (*outLen));
     printf("outLen=%d\n", (*outLen));
