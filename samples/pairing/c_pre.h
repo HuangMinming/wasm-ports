@@ -33,7 +33,7 @@ typedef struct {
 
 
 // 函数声明
-void Setup(pairing_t pairing, element_t g, element_t Z, int &n)；
+void Setup(pairing_t pairing, element_t g, element_t Z, int &n);
 void Hash1(element_t result, char* m, element_t R);
 void Hash2(element_t result, element_t pk, char* w);
 void Hash3(char* bitstring, element_t R);
