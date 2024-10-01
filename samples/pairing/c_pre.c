@@ -29,6 +29,13 @@ sign0 1";
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
     (*p_n) = 50;
+    unsigned char g_data[1024];
+    size_t g_len = element_length_in_bytes(g);
+    printf("g_len = %d, g=\n", g_len);
+    for(int i=0;i<g_len;i++){
+        printf("%02x ", g_data[i]);
+    }
+    printf("\n");
 
     
 }
