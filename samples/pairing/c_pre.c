@@ -319,7 +319,7 @@ char* Dec2(CipherText CipherText, element_t sk, element_t pk, char* w)
     element_init_G1(C1_2, pairing);
     element_pow_zn(C1_2, g, hash1result);
     if (element_cmp(C1_2, CipherText.c1) != 0) {
-        printf("双线性对检查失败，返回 NULL 密文\n");
+        printf("verify g^H1(m, R) == C1 fail\n");
         element_clear(hash1result);
         element_clear(C1_2);
         element_clear(hash2result);
@@ -329,7 +329,7 @@ char* Dec2(CipherText CipherText, element_t sk, element_t pk, char* w)
         // 处理错误，或返回 ⊥
         return NULL;
     }
-    printf("双线性对检查通过\n");
+    printf("verify g^H1(m, R) == C1 success\n");
 
 
     element_clear(hash2result);
