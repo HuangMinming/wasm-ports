@@ -31,6 +31,7 @@ sign0 1";
     (*p_n) = 50;
     unsigned char g_data[1024];
     size_t g_len = element_length_in_bytes(g);
+    element_to_bytes(g_data, g);
     printf("g_len = %d, g=\n", g_len);
     for(int i=0;i<g_len;i++){
         printf("%02x ", g_data[i]);
@@ -176,6 +177,7 @@ int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
 
     unsigned char g_data[1024];
     size_t g_len = element_length_in_bytes(g);
+    element_to_bytes(g_data, g);
     printf("g_len = %d, g=\n", g_len);
     for(int i=0;i<g_len;i++){
         printf("%02x ", g_data[i]);
