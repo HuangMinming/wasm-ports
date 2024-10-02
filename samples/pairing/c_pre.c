@@ -197,11 +197,11 @@ int KeyGen(unsigned char *pk, int *p_pk_len, unsigned char *sk, int *p_sk_len)
     sha256_starts( &ctx );
     sha256_update( &ctx, (uint8 *) g_data, g_len );
     sha256_finish( &ctx, hash );
-    sgx_printf("hash(g_data)=\n");
+    printf("hash(g_data)=\n");
     for(int i=0;i<SHA256_DIGEST_LENGTH_32;i++) {
-        sgx_printf("%02x ", hash[i]);
+        printf("%02x ", hash[i]);
     }
-    sgx_printf("\n");
+    printf("\n");
 
     printf("n=%d\n", n);
 
