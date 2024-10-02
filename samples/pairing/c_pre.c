@@ -773,7 +773,7 @@ int Enc2(unsigned char *pk_Hex_data, int pk_Hex_data_len)
     Setup(pairing, g, Z, &n);
 
     //import pk
-    uint8_t *pk_data[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t pk_data[G1_ELEMENT_LENGTH_IN_BYTES];
     printf("pk_Hex_data=\n");
     for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
         printf("%c", (unsigned int)pk_Hex_data[i]);
