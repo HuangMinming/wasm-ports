@@ -51,6 +51,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
 		return 1;
 	const uint8_t * index = src_buf, * end = src_buf + src_len;
     uint8_t * ridx = dest_buf;
+    int i=0;
     
     while (index < end)
     {
@@ -67,7 +68,8 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
         else
             lowByte -= 0x30;
 
-        *ridx ++ = (highByte << 4) | lowByte;
+        // *ridx ++ = (highByte << 4) | lowByte;
+        dest_buf[i++] = (highByte << 4) | lowByte;
     }
 
     printf("ByteStrToHexStr start:\n");
