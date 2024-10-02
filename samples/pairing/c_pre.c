@@ -675,8 +675,6 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
     (*p_pk_Hex_len) = element_to_bytes(pk_data, keypair.pk);
     (*p_sk_Hex_len) = element_to_bytes(sk_data, keypair.sk);
 
-    memcpy(pk, pk_data, (*p_pk_Hex_len));
-    memcpy(sk, sk_data, (*p_sk_Hex_len));
 
     printf("(*p_pk_len) = %d, pk_data=\n", g_len);
     for(int i=0;i<(*p_pk_Hex_len);i++){
@@ -689,8 +687,8 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
         sprintf((char*)sk_Hex, "%02x", sk_data[i]);
     }
     printf("\n");
-    (*p_pk_Hex_len) * = 2;
-    (*p_sk_Hex_len) * = 2;
+    (*p_pk_Hex_len) *= 2;
+    (*p_sk_Hex_len) *= 2;
 
     element_clear(keypair.pk);
     element_clear(keypair.sk);
