@@ -756,12 +756,17 @@ int Enc2(unsigned char *pk_Hex_data, int pk_Hex_data_len)
 
     //import pk
     unsigned char *pk_data[G1_ELEMENT_LENGTH_IN_BYTES];
+    printf("pk_Hex_data=\n");
+    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+        printf("%c", (unsigned int)pk_Hex_data[i]);
+    }
+    printf("\n");
+    int iret = HexStrToByteStr((uint8_t *)pk_Hex_data, pk_Hex_data_len, (uint8_t *)pk_data);
     printf("pk_data=\n");
     for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
         printf("%02x ", (unsigned int)pk_data[i]);
     }
     printf("\n");
-    int iret = HexStrToByteStr((uint8_t *)pk_Hex_data, pk_Hex_data_len, (uint8_t *)pk_data);
 
     element_init_G1(keypair.pk, pairing);
     int pk_len = element_from_bytes(keypair.pk, (unsigned char *)pk_data);
@@ -791,12 +796,12 @@ int main() {
 
     printf("pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
     for(int i=0;i<pk_Hex_len;i++) {
-        printf("%02x ", pk_Hex[i]);
+        printf("%c", pk_Hex[i]);
     }
     printf("\n");
     printf("sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
     for(int i=0;i<sk_Hex_len;i++) {
-        printf("%02x ", sk_Hex[i]);
+        printf("%c", sk_Hex[i]);
     }
     printf("\n");
 
