@@ -5,6 +5,7 @@
 #include "sha256.h"
 #include "c_pre.h"
 #include <time.h>
+#include <ctype.h>
 
 
 /*
