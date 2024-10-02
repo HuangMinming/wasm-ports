@@ -232,40 +232,40 @@ sign0 1";
 //     return rk_ij;
 // }
 
-CipherText Enc2(element_t pk,  char* w,  char* m)
-{
-    CipherText ciphertext;
-    element_init_G1(ciphertext.c1, pairing);
-    element_init_GT(ciphertext.c2, pairing);
-    element_init_G1(ciphertext.c4, pairing);
-    // 为 ciphertext.c3 分配内存
-    ciphertext.c3 = (char *) malloc(n + 1);
-    element_t R, r, hash2result, eresult, hash4result;
-    element_init_GT(R, pairing);
-    element_random(R);
-    element_init_Zr(r, pairing);
-    element_init_G1(hash2result, pairing);
-    element_init_GT(eresult, pairing);
-    element_init_G1(hash4result, pairing);
-    Hash1(r, m, R); 
-    element_pow_zn(ciphertext.c1, g, r);
-    Hash2(hash2result, pk, w);
-    element_pairing(eresult, pk, hash2result);
-    element_pow_zn(eresult, eresult, r);
-    element_mul(ciphertext.c2, R, eresult);
-    char *hash3result = (char *) malloc(n + 1);
-    Hash3(hash3result, R);
-    xor_bitstrings(ciphertext.c3, m, hash3result);
-    Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3);
-    element_pow_zn(ciphertext.c4, hash4result, r);
-    element_clear(R);
-    element_clear(r);
-    element_clear(hash2result);
-    element_clear(eresult);
-    element_clear(hash4result);
-    free(hash3result);
-    return ciphertext;
-}
+// CipherText Enc2(element_t pk,  char* w,  char* m)
+// {
+//     CipherText ciphertext;
+//     element_init_G1(ciphertext.c1, pairing);
+//     element_init_GT(ciphertext.c2, pairing);
+//     element_init_G1(ciphertext.c4, pairing);
+//     // 为 ciphertext.c3 分配内存
+//     ciphertext.c3 = (char *) malloc(n + 1);
+//     element_t R, r, hash2result, eresult, hash4result;
+//     element_init_GT(R, pairing);
+//     element_random(R);
+//     element_init_Zr(r, pairing);
+//     element_init_G1(hash2result, pairing);
+//     element_init_GT(eresult, pairing);
+//     element_init_G1(hash4result, pairing);
+//     Hash1(r, m, R); 
+//     element_pow_zn(ciphertext.c1, g, r);
+//     Hash2(hash2result, pk, w);
+//     element_pairing(eresult, pk, hash2result);
+//     element_pow_zn(eresult, eresult, r);
+//     element_mul(ciphertext.c2, R, eresult);
+//     char *hash3result = (char *) malloc(n + 1);
+//     Hash3(hash3result, R);
+//     xor_bitstrings(ciphertext.c3, m, hash3result);
+//     Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3);
+//     element_pow_zn(ciphertext.c4, hash4result, r);
+//     element_clear(R);
+//     element_clear(r);
+//     element_clear(hash2result);
+//     element_clear(eresult);
+//     element_clear(hash4result);
+//     free(hash3result);
+//     return ciphertext;
+// }
 
 // CipherText Enc1(element_t pk, char* m)
 // {
