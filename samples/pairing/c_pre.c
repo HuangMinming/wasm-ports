@@ -21,7 +21,7 @@ uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
     
     while (index < end)
     {
-        highHex = index >> 4;
+        highHex = (index >> 4);
         lowHex = index & 0x0F;
         index ++;
 
