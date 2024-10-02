@@ -51,7 +51,6 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
 		return 1;
 	const uint8_t * index = src_buf, * end = src_buf + src_len;
     uint8_t * ridx = dest_buf;
-    int i=0;
     
     while (index < end)
     {
@@ -68,8 +67,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
         else
             lowByte -= 0x30;
 
-        // *ridx ++ = (highByte << 4) | lowByte;
-        dest_buf[i++] = (highByte << 4) | lowByte;
+        *ridx ++ = (highByte << 4) | lowByte;
     }
 
     printf("ByteStrToHexStr start:\n");
@@ -784,7 +782,7 @@ int Enc2(unsigned char *pk_Hex_data, int pk_Hex_data_len)
     int iret = HexStrToByteStr((uint8_t *)pk_Hex_data, pk_Hex_data_len, pk_data);
     printf("pk_data=\n");
     for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", pk_data[i]);
+        printf("%02x ", (uint8_t)pk_data[i]);
     }
     printf("\n");
 
