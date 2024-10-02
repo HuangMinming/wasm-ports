@@ -78,6 +78,33 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
     return 0;
 }
 
+
+void bytes_to_bits( unsigned char *bytes, int byte_len, char *bitstring) {
+    int i, j;
+    int bit_index = 0;
+    int n = byte_len * 8;
+    for (i = 0; i < byte_len && bit_index < n; i++) {
+        for (j = 7; j >= 0 && bit_index < n; j--) {
+            bitstring[bit_index++] = (bytes[i] & (1 << j)) ? '1' : '0';
+        }
+    }
+    bitstring[bit_index] = '\0';  // 结束符
+}
+
+//这里要求str1和str2的长度必须一致，否则会越界，这里都是256
+void xor_bitstrings(char *result, char *str1, char *str2) {
+    int n = strlen(str1);
+    for (int i = 0; i < n; i++) {
+        // 逐位进行异或 ('0' 异或 '0' 为 '0', '0' 异或 '1' 为 '1', '1' 异或 '1' 为 '0')
+        if (str1[i] == str2[i]) {
+            result[i] = '0';  // 相同为 '0'
+        } else {
+            result[i] = '1';  // 不同为 '1'
+        }
+    }
+    result[n] = '\0';  // 确保字符串以 '\0' 结束
+}
+
 void Setup(pairing_t pairing, element_t g, element_t Z, int *p_n)
 {
     char *param="type a\n\
@@ -199,7 +226,6 @@ void Hash3(char *bitstring, element_t R){
     sha256_finish( &ctx, hash );
 
     // 将哈希结果转化为二进制比特串
-    // todo: 应该是要输出256bit，不能使用n
     bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring);
     // 释放内存
     free(R_bytes);
@@ -585,31 +611,6 @@ void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
 // }
 // #endif
 
-void bytes_to_bits( unsigned char *bytes, int byte_len, char *bitstring) {
-    int i, j;
-    int bit_index = 0;
-    int n = byte_len * 8;
-    for (i = 0; i < byte_len && bit_index < n; i++) {
-        for (j = 7; j >= 0 && bit_index < n; j--) {
-            bitstring[bit_index++] = (bytes[i] & (1 << j)) ? '1' : '0';
-        }
-    }
-    bitstring[bit_index] = '\0';  // 结束符
-}
-
-//这里要求str1和str2的长度必须一致，否则会越界，这里都是256
-void xor_bitstrings(char *result, char *str1, char *str2) {
-    int n = strlen(str1);
-    for (int i = 0; i < n; i++) {
-        // 逐位进行异或 ('0' 异或 '0' 为 '0', '0' 异或 '1' 为 '1', '1' 异或 '1' 为 '0')
-        if (str1[i] == str2[i]) {
-            result[i] = '0';  // 相同为 '0'
-        } else {
-            result[i] = '1';  // 不同为 '1'
-        }
-    }
-    result[n] = '\0';  // 确保字符串以 '\0' 结束
-}
 
 // // 生成n位的随机比特串
 // void random_bitstring(char *bitstring, int n) {
@@ -843,7 +844,7 @@ int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len,
     free(hash3result);
 
     element_clear(ciphertext.c4);
-    free(ciphertext.c3)
+    free(ciphertext.c3);
     element_clear(ciphertext.c2);
     element_clear(ciphertext.c1);
     element_clear(keypair.pk);
