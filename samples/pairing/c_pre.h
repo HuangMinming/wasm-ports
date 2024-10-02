@@ -7,11 +7,8 @@
 #include <pbc/pbc.h>
 #include <emscripten/emscripten.h>
 
+#define SHA256_DIGEST_LENGTH_32 32
 
-// extern pairing_t pairing;
-// extern element_t g;
-// extern int n;
-// extern element_t Z;
 
 // 结构体定义
 typedef struct {
