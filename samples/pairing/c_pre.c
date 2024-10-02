@@ -710,17 +710,29 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
 
     ByteStrToHexStr(pk_data, (*p_pk_Hex_len), pk_Hex);
     ByteStrToHexStr(sk_data, (*p_sk_Hex_len), sk_Hex);
-    printf("(*p_pk_len) = %d, pk_data=\n", g_len);
+    printf("(*p_pk_len) = %d, pk_data=\n", (*p_pk_Hex_len));
     for(int i=0;i<(*p_pk_Hex_len);i++){
         printf("%02x ", pk_data[i]);
     }
     printf("\n");
+    printf("(*p_sk_Hex_len) = %d, sk_data=\n", (*p_sk_Hex_len));
     for(int i=0;i<(*p_sk_Hex_len);i++){
         printf("%02x ", sk_data[i]);
     }
     printf("\n");
     (*p_pk_Hex_len) *= 2;
     (*p_sk_Hex_len) *= 2;
+
+    printf("(*p_pk_Hex_len) = %d, pk_Hex=\n", (*p_pk_Hex_len));
+    for(int i=0;i<(*p_pk_Hex_len);i++) {
+        printf("%c", pk_Hex[i]);
+    }
+    printf("\n");
+    printf("(*p_sk_Hex_len) = %d, sk_Hex=\n", (*p_sk_Hex_len));
+    for(int i=0;i<(*p_sk_Hex_len);i++) {
+        printf("%c", sk_Hex[i]);
+    }
+    printf("\n");
 
     element_clear(keypair.pk);
     element_clear(keypair.sk);
