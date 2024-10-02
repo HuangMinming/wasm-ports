@@ -9,6 +9,39 @@
 
 
 /*
+[0x23, 0x3A, 0x46, 0x4C, 0x52] ==> “233A464C52”
+*/
+uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len, uint8_t * dest_buf)
+{
+    uint8_t highHex, lowHex;
+    if(NULL == src_buf)
+		return 1;
+	const uint8_t * index = src_buf, * end = src_buf + src_len;
+    uint8_t * ridx = dest_buf;
+    
+    while (index < end)
+    {
+        highHex = index >> 4;
+        lowHex = index & 0x0F;
+        index ++;
+
+        if (highHex > 0x09)
+            highHex += 0x57;
+        else
+            highHex += 0x30;
+
+        if (lowHex > 0x09)
+            lowHex += 0x57;
+        else
+            lowHex += 0x30;
+
+        *ridx ++ = highHex;
+        *ridx ++ = lowHex;
+    }
+    return 0;
+}
+
+/*
  “233A464C52” ==>[0x23, 0x3A, 0x46, 0x4C, 0x52]
 */
 uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_buf)
@@ -675,16 +708,15 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
     (*p_pk_Hex_len) = element_to_bytes(pk_data, keypair.pk);
     (*p_sk_Hex_len) = element_to_bytes(sk_data, keypair.sk);
 
-
+    ByteStrToHexStr(pk_data, (*p_pk_Hex_len), pk_Hex);
+    ByteStrToHexStr(sk_data, (*p_sk_Hex_len), sk_Hex);
     printf("(*p_pk_len) = %d, pk_data=\n", g_len);
     for(int i=0;i<(*p_pk_Hex_len);i++){
         printf("%02x ", pk_data[i]);
-        sprintf((char*)pk_Hex, "%02x", pk_data[i]);
     }
     printf("\n");
     for(int i=0;i<(*p_sk_Hex_len);i++){
         printf("%02x ", sk_data[i]);
-        sprintf((char*)sk_Hex, "%02x", sk_data[i]);
     }
     printf("\n");
     (*p_pk_Hex_len) *= 2;
@@ -751,9 +783,9 @@ int Enc2(unsigned char *pk_Hex_data, int pk_Hex_data_len)
 int main() {
 
     unsigned char pk_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    unsigned char sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES];
+    unsigned char sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
     int pk_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
-    int sk_Hex_len = ZR_ELEMENT_LENGTH_IN_BYTES;
+    int sk_Hex_len = ZR_ELEMENT_LENGTH_IN_BYTES * 2;
 
     KeyGen(pk_Hex, &pk_Hex_len, sk_Hex, &sk_Hex_len);
 
