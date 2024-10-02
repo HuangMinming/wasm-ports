@@ -81,130 +81,130 @@ sign0 1";
     
 }
 
-//Hash1 {0,1}* -> Zq
-void Hash1(element_t result, char* m, element_t R)
-{
-    int R_len = element_length_in_bytes(R);
-    unsigned char *R_bytes = (unsigned char *) malloc(R_len);
-    element_to_bytes(R_bytes, R);  // 序列化 GT 群中的元素 R
+// //Hash1 {0,1}* -> Zq
+// void Hash1(element_t result, char* m, element_t R)
+// {
+//     int R_len = element_length_in_bytes(R);
+//     unsigned char *R_bytes = (unsigned char *) malloc(R_len);
+//     element_to_bytes(R_bytes, R);  // 序列化 GT 群中的元素 R
     
-    // 获取输入字符串 m 的长度
-    int m_len = strlen(m);
+//     // 获取输入字符串 m 的长度
+//     int m_len = strlen(m);
     
-    // 合并 m 和 R_bytes
-    unsigned char *input = (unsigned char *) malloc(m_len + R_len);
-    memcpy(input, m, m_len);
-    memcpy(input + m_len, R_bytes, R_len);
+//     // 合并 m 和 R_bytes
+//     unsigned char *input = (unsigned char *) malloc(m_len + R_len);
+//     memcpy(input, m, m_len);
+//     memcpy(input + m_len, R_bytes, R_len);
     
-    // 使用 OpenSSL SHA256 进行哈希
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    // SHA256(input, m_len + R_len, hash);
-    sha256_context ctx;
-    sha256_starts( &ctx );
-    sha256_update( &ctx, (uint8 *) input, m_len + R_len );
-    sha256_finish( &ctx, hash );
+//     // 使用 OpenSSL SHA256 进行哈希
+//     unsigned char hash[SHA256_DIGEST_LENGTH];
+//     // SHA256(input, m_len + R_len, hash);
+//     sha256_context ctx;
+//     sha256_starts( &ctx );
+//     sha256_update( &ctx, (uint8 *) input, m_len + R_len );
+//     sha256_finish( &ctx, hash );
     
-    // 将哈希值转化为大整数
-    mpz_t hash_int;
-    mpz_init(hash_int);
-    mpz_import(hash_int, SHA256_DIGEST_LENGTH, 1, sizeof(hash[0]), 0, 0, hash);
+//     // 将哈希值转化为大整数
+//     mpz_t hash_int;
+//     mpz_init(hash_int);
+//     mpz_import(hash_int, SHA256_DIGEST_LENGTH, 1, sizeof(hash[0]), 0, 0, hash);
 
-    // 对 hash_int 取模并存入 result
-    element_init_Zr(result, pairing);  // 初始化 result 为 Zq 上的元素
-    element_set_mpz(result, hash_int);  // 将哈希值映射到 Zq 上
+//     // 对 hash_int 取模并存入 result
+//     element_init_Zr(result, pairing);  // 初始化 result 为 Zq 上的元素
+//     element_set_mpz(result, hash_int);  // 将哈希值映射到 Zq 上
     
-    // 释放内存
-    free(R_bytes);
-    free(input);
-    mpz_clear(hash_int);
-}
+//     // 释放内存
+//     free(R_bytes);
+//     free(input);
+//     mpz_clear(hash_int);
+// }
 
-//Hash2 {0,1}* -> G1
-void Hash2(element_t result, element_t pk,  char* w) {
-    // SHA256_CTX sha256;
-    // SHA256_Init(&sha256);
-    sha256_context ctx;
-    sha256_starts( &ctx );
+// //Hash2 {0,1}* -> G1
+// void Hash2(element_t result, element_t pk,  char* w) {
+//     // SHA256_CTX sha256;
+//     // SHA256_Init(&sha256);
+//     sha256_context ctx;
+//     sha256_starts( &ctx );
 
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    size_t pk_len = element_length_in_bytes(pk);
-    size_t w_len = strlen(w);
-    unsigned char combined_input[pk_len + w_len];
+//     unsigned char hash[SHA256_DIGEST_LENGTH];
+//     size_t pk_len = element_length_in_bytes(pk);
+//     size_t w_len = strlen(w);
+//     unsigned char combined_input[pk_len + w_len];
 
-    // 将 pk 转换为字节形式
-    element_to_bytes(combined_input, pk); 
+//     // 将 pk 转换为字节形式
+//     element_to_bytes(combined_input, pk); 
 
-    // 将 w 也转换为字节形式，并拼接到 combined_input 中
-    memcpy(combined_input + pk_len, w, w_len);
+//     // 将 w 也转换为字节形式，并拼接到 combined_input 中
+//     memcpy(combined_input + pk_len, w, w_len);
 
-    // SHA256_Update(&sha256, combined_input, pk_len + w_len);
-    // SHA256_Final(hash, &sha256);
-    sha256_update( &ctx, (uint8 *) combined_input, pk_len + w_len );
-    sha256_finish( &ctx, hash );
-    element_init_G1(result, pairing);
-    // 将哈希值映射到群元素
-    element_from_hash(result, hash, SHA256_DIGEST_LENGTH); // result 是群元素
-}
+//     // SHA256_Update(&sha256, combined_input, pk_len + w_len);
+//     // SHA256_Final(hash, &sha256);
+//     sha256_update( &ctx, (uint8 *) combined_input, pk_len + w_len );
+//     sha256_finish( &ctx, hash );
+//     element_init_G1(result, pairing);
+//     // 将哈希值映射到群元素
+//     element_from_hash(result, hash, SHA256_DIGEST_LENGTH); // result 是群元素
+// }
 
 
-// Hash3 G1 -> {0,1}^n
-void Hash3(char *bitstring, element_t R){
-    // 获取 G1 群元素 R 的字节表示
-    int R_len = element_length_in_bytes(R);
-    unsigned char *R_bytes = (unsigned char *) malloc(R_len);
-    element_to_bytes(R_bytes, R);  // 序列化 G1 群中的元素 R
+// // Hash3 G1 -> {0,1}^n
+// void Hash3(char *bitstring, element_t R){
+//     // 获取 G1 群元素 R 的字节表示
+//     int R_len = element_length_in_bytes(R);
+//     unsigned char *R_bytes = (unsigned char *) malloc(R_len);
+//     element_to_bytes(R_bytes, R);  // 序列化 G1 群中的元素 R
 
-    // 使用 OpenSSL 的 SHA256 进行哈希
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    // SHA256(R_bytes, R_len, hash);
-    sha256_context ctx;
-    sha256_starts( &ctx );
-    sha256_update( &ctx, (uint8 *) R_bytes, R_len );
-    sha256_finish( &ctx, hash );
+//     // 使用 OpenSSL 的 SHA256 进行哈希
+//     unsigned char hash[SHA256_DIGEST_LENGTH];
+//     // SHA256(R_bytes, R_len, hash);
+//     sha256_context ctx;
+//     sha256_starts( &ctx );
+//     sha256_update( &ctx, (uint8 *) R_bytes, R_len );
+//     sha256_finish( &ctx, hash );
 
-    // 将哈希结果转化为二进制比特串
-    bytes_to_bits(hash, SHA256_DIGEST_LENGTH, bitstring, n);
-    // 释放内存
-    free(R_bytes);
-}
+//     // 将哈希结果转化为二进制比特串
+//     bytes_to_bits(hash, SHA256_DIGEST_LENGTH, bitstring, n);
+//     // 释放内存
+//     free(R_bytes);
+// }
 
-void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
-    // SHA256_CTX sha256;
-    // SHA256_Init(&sha256);
-    sha256_context ctx;
-    sha256_starts( &ctx );
+// void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
+//     // SHA256_CTX sha256;
+//     // SHA256_Init(&sha256);
+//     sha256_context ctx;
+//     sha256_starts( &ctx );
 
-    // 获取 G1 群元素 c1 的字节长度
-    size_t c1_len = element_length_in_bytes(c1);
-    // 获取 GT 群元素 c2 的字节长度
-    size_t c2_len = element_length_in_bytes(c2);
-    // 获取 c3 的长度
-    size_t c3_len = strlen(c3);
+//     // 获取 G1 群元素 c1 的字节长度
+//     size_t c1_len = element_length_in_bytes(c1);
+//     // 获取 GT 群元素 c2 的字节长度
+//     size_t c2_len = element_length_in_bytes(c2);
+//     // 获取 c3 的长度
+//     size_t c3_len = strlen(c3);
 
-    // 分配足够大的缓冲区来存储 c1, c2 和 c3 的拼接结果
-    unsigned char combined_input[c1_len + c2_len + c3_len];
+//     // 分配足够大的缓冲区来存储 c1, c2 和 c3 的拼接结果
+//     unsigned char combined_input[c1_len + c2_len + c3_len];
 
-    // 将 c1 转换为字节形式
-    element_to_bytes(combined_input, c1);
+//     // 将 c1 转换为字节形式
+//     element_to_bytes(combined_input, c1);
 
-    // 将 c2 转换为字节形式，并拼接到 combined_input 中
-    element_to_bytes(combined_input + c1_len, c2);
+//     // 将 c2 转换为字节形式，并拼接到 combined_input 中
+//     element_to_bytes(combined_input + c1_len, c2);
 
-    // 将 c3 拼接到 combined_input 中
-    memcpy(combined_input + c1_len + c2_len, c3, c3_len);
+//     // 将 c3 拼接到 combined_input 中
+//     memcpy(combined_input + c1_len + c2_len, c3, c3_len);
 
-    // 进行 SHA256 哈希
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    // SHA256_Update(&sha256, combined_input, c1_len + c2_len + c3_len);
-    // SHA256_Final(hash, &sha256);
-    sha256_update( &ctx, (uint8 *) combined_input, c1_len + c2_len + c3_len );
-    sha256_finish( &ctx, hash );
+//     // 进行 SHA256 哈希
+//     unsigned char hash[SHA256_DIGEST_LENGTH];
+//     // SHA256_Update(&sha256, combined_input, c1_len + c2_len + c3_len);
+//     // SHA256_Final(hash, &sha256);
+//     sha256_update( &ctx, (uint8 *) combined_input, c1_len + c2_len + c3_len );
+//     sha256_finish( &ctx, hash );
 
-    element_init_G1(result, pairing);
-    // 将哈希值映射到群元素 result
-    element_from_hash(result, hash, SHA256_DIGEST_LENGTH);  // 将哈希值映射为群元素
+//     element_init_G1(result, pairing);
+//     // 将哈希值映射到群元素 result
+//     element_from_hash(result, hash, SHA256_DIGEST_LENGTH);  // 将哈希值映射为群元素
 
-}
+// }
 
 
 // ReKeyPair ReKeyGen(element_t ski, char* w, element_t pkj, element_t pki) //pki不在输入中
