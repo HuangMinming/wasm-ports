@@ -661,42 +661,42 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
         printf("pk_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", pk_len, G1_ELEMENT_LENGTH_IN_BYTES);
         printf("sk_len = %d, ZR_ELEMENT_LENGTH_IN_BYTES = %d\n", sk_len, ZR_ELEMENT_LENGTH_IN_BYTES);
         printf("exit \n");
-        element_clear(keypair.pk)
-        element_clear(keypair.sk)
-        element_clear(Z)
-        element_clear(g)
-        pairing_clear(pairing)
+        element_clear(keypair.pk);
+        element_clear(keypair.sk);
+        element_clear(Z);
+        element_clear(g);
+        pairing_clear(pairing);
         return -1;
     }
     
     unsigned char pk_data[G1_ELEMENT_LENGTH_IN_BYTES];
     unsigned char sk_data[ZR_ELEMENT_LENGTH_IN_BYTES];
 
-    (*p_pk_len) = element_to_bytes(pk_data, keypair.pk);
-    (*p_sk_len) = element_to_bytes(sk_data, keypair.sk);
+    (*p_pk_Hex_len) = element_to_bytes(pk_data, keypair.pk);
+    (*p_sk_Hex_len) = element_to_bytes(sk_data, keypair.sk);
 
-    memcpy(pk, pk_data, (*p_pk_len));
-    memcpy(sk, sk_data, (*p_sk_len));
+    memcpy(pk, pk_data, (*p_pk_Hex_len));
+    memcpy(sk, sk_data, (*p_sk_Hex_len));
 
     printf("(*p_pk_len) = %d, pk_data=\n", g_len);
-    for(int i=0;i<(*p_pk_len);i++){
+    for(int i=0;i<(*p_pk_Hex_len);i++){
         printf("%02x ", pk_data[i]);
-        sprintf(pk_Hex, "%02x", pk_data[i]);
+        sprintf((char*)pk_Hex, "%02x", pk_data[i]);
     }
     printf("\n");
-    for(int i=0;i<(*p_sk_len);i++){
+    for(int i=0;i<(*p_sk_Hex_len);i++){
         printf("%02x ", sk_data[i]);
-        sprintf(sk_Hex, "%02x", sk_data[i]);
+        sprintf((char*)sk_Hex, "%02x", sk_data[i]);
     }
     printf("\n");
-    (*p_pk_len) * = 2;
-    (*p_sk_len) * = 2;
+    (*p_pk_Hex_len) * = 2;
+    (*p_sk_Hex_len) * = 2;
 
-    element_clear(keypair.pk)
-    element_clear(keypair.sk)
-    element_clear(Z)
-    element_clear(g)
-    pairing_clear(pairing)
+    element_clear(keypair.pk);
+    element_clear(keypair.sk);
+    element_clear(Z);
+    element_clear(g);
+    pairing_clear(pairing);
 
     printf("********************************\n");
     printf("**********KeyGen end************\n");
@@ -737,10 +737,10 @@ int Enc2(unsigned char *pk_Hex_data, int pk_Hex_data_len)
     int pk_len = element_from_bytes(keypair.pk, pk_data);
 
 
-    element_clear(keypair.pk)
-    element_clear(Z)
-    element_clear(g)
-    pairing_clear(pairing)
+    element_clear(keypair.pk);
+    element_clear(Z);
+    element_clear(g);
+    pairing_clear(pairing);
 
     printf("********************************\n");
     printf("**********Enc2 end************\n");
