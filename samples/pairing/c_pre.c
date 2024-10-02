@@ -69,6 +69,12 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
 
         *ridx ++ = (highByte << 4) | lowByte;
     }
+
+    printf("ByteStrToHexStr start:\n");
+    for(int i=0;i<src_len/2;i++){
+        printf("%02x ", dest_buf[i]);
+    }
+    printf("ByteStrToHexStr end:\n");
     return 0;
 }
 
