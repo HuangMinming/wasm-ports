@@ -881,8 +881,8 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 
     element_to_bytes(c1_bytes, ciphertext.c1);
-    element_to_bytes(c2_bytes, ciphertext.c1);
-    element_to_bytes(c4_bytes, ciphertext.c1);
+    element_to_bytes(c2_bytes, ciphertext.c2);
+    element_to_bytes(c4_bytes, ciphertext.c4);
     printf("c1:\n");
     for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
         printf("%02x ", c1_bytes[i]);
@@ -907,7 +907,7 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     //c1, c2, c3, c4 convert to Hex
     ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex);
     ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
-    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c1_Hex);
+    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
     ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
 
 
