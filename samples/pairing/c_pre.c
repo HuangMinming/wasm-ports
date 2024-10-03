@@ -855,13 +855,9 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
 
-    uint8_t hash3result_bytes[8196];
-    len = element_to_bytes(hash3result_bytes, hash3result); 
-    printf("hash3result_bytes:\n");
-    for(int i=0;i<len;i++) {
-        printf("%02x ", hash3result_bytes[i]);
-    }
-    printf("\n");
+
+    printf("hash3result: %s\n",hash3result);
+
     printf("ok5\n");
     //get c3
     xor_bitstrings(ciphertext.c3, m, hash3result);
@@ -1189,13 +1185,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
 
-    uint8_t hash3result_bytes[8196];
-    len = element_to_bytes(hash3result_bytes, hash3result); 
-    printf("hash3result_bytes:\n");
-    for(int i=0;i<len;i++) {
-        printf("%02x ", hash3result_bytes[i]);
-    }
-    printf("\n");
+    printf("hash3result: %s\n",hash3result);
 
 
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
