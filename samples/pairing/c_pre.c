@@ -791,6 +791,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     int m_len = strlen((const char *)m_bytes) * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
+    printf("m=%s\n", m);
 
     pairing_t pairing;
     element_t g;
@@ -986,7 +987,7 @@ int importCipherText(CipherText *ciphertext,
     printf("\n");
     int iret = HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes);
     printf("after HexStrToByteStr, c1_bytes=\n");
-    for(int i=0;i<c1_Hex_len;i++) {
+    for(int i=0;i<c1_Hex_len/2;i++) {
         printf("%02x ", c1_bytes[i]);
     }
     printf("\n");
@@ -1004,7 +1005,7 @@ int importCipherText(CipherText *ciphertext,
     printf("\n");
     iret = HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes);
     printf("after HexStrToByteStr, c2_bytes=\n");
-    for(int i=0;i<c2_Hex_len;i++) {
+    for(int i=0;i<c2_Hex_len/2;i++) {
         printf("%02x ", c2_bytes[i]);
     }
     printf("\n");
@@ -1016,13 +1017,13 @@ int importCipherText(CipherText *ciphertext,
     //import c3
     uint8_t c3_bytes[SHA256_DIGEST_LENGTH_32 * 8];
     printf("before HexStrToByteStr, c3_Hex=\n");
-    for(int i=0;i<c4_Hex_len;i++) {
+    for(int i=0;i<c3_Hex_len;i++) {
         printf("%c", (unsigned int)c3_Hex[i]);
     }
     printf("\n");
     iret = HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes);
     printf("after HexStrToByteStr, c3_bytes=\n");
-    for(int i=0;i<c3_Hex_len;i++) {
+    for(int i=0;i<c3_Hex_len/2;i++) {
         printf("%02x ", c3_bytes[i]);
     }
     printf("\n");
@@ -1040,7 +1041,7 @@ int importCipherText(CipherText *ciphertext,
     printf("\n");
     iret = HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes);
     printf("after HexStrToByteStr, c4_bytes=\n");
-    for(int i=0;i<c4_Hex_len;i++) {
+    for(int i=0;i<c4_Hex_len/2;i++) {
         printf("%02x ", c4_bytes[i]);
     }
     printf("\n");
@@ -1168,6 +1169,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     Hash3(hash3result, R);
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     xor_bitstrings(m, ciphertext.c3, hash3result);
+    printf("m=%s\n", m);
 
     //verify g^H1(m, R) == C1
     element_t hash1result;
