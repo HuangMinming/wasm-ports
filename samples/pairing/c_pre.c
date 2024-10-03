@@ -698,7 +698,6 @@ int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_le
     }
     printf("\n");
 
-    printf("n=%d\n", n);
 
     element_init_G1(keypair.pk, pairing);
     element_init_Zr(keypair.sk, pairing);
