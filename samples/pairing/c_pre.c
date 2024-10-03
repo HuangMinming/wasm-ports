@@ -79,15 +79,16 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
 }
 // "11010011" --> 0xD3
 void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
+    printf("bits_to_bytes, bitstring = %s\n", bitstring);
     int i, j;
     int byte_index = 0;
     int n = bit_len / 8;
     for (i = 0; i < bit_len && byte_index < n; i++) {
         bytes[byte_index]= bitstring[i++] - '0';
-        printf("%02x\n", bytes[byte_index]);
-        for (j = 1; j < 8; j++) {
+        printf("%02x %c\n", bytes[byte_index],bitstring[i]);     
+        for (j = 1; j < 8 && i < bit_len; j++) {
             bytes[byte_index] = (bytes[byte_index] < 1) | (bitstring[i++] - '0');
-            printf("%02x\n", bytes[byte_index]);
+            printf("%02x %c\n", bytes[byte_index], bitstring[i]);
         }
         byte_index ++;
     }
