@@ -861,7 +861,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
 
     //import pk
     element_init_G1(keypair.pk, pairing);
-    importKeyPair(&keypair, uint8_t *pk_Hex, int pk_Hex_len, NULL, 0);
+    importKeyPair(&keypair, pk_Hex, pk_Hex_len, NULL, 0);
     // uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
     // printf("pk_Hex=\n");
     // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
