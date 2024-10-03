@@ -1187,7 +1187,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         element_clear(hash2result);
         element_clear(ciphertext.c1);
         element_clear(ciphertext.c2);
-        free(ciphertext.c3)
+        free(ciphertext.c3);
         element_clear(ciphertext.c4);
         element_clear(keypair.sk);
         element_clear(keypair.pk);
@@ -1212,7 +1212,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(hash2result);
     element_clear(ciphertext.c1);
     element_clear(ciphertext.c2);
-    free(ciphertext.c3)
+    free(ciphertext.c3);
     element_clear(ciphertext.c4);
     element_clear(keypair.sk);
     element_clear(keypair.pk);
@@ -1283,7 +1283,7 @@ int main() {
     Dec2(pk_Hex, sizeof(pk_Hex), sk_Hex, sizeof(sk_Hex),
         w, c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
-        m_bytes, sizeof(m_bytes))
+        m_bytes, sizeof(m_bytes));
     printf("main: m_bytes = %s\n", m_bytes);
     return 0;
 }
