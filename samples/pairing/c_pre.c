@@ -85,12 +85,12 @@ void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
     int n = bit_len / 8;
     for (i = 0; i < bit_len && byte_index < n; ) {
         bytes[byte_index]= bitstring[i++] - '0';
-        printf("%02x %c\n", bytes[byte_index],bitstring[i]);     
+        // printf("%02x %c\n", bytes[byte_index],bitstring[i]);
         for (j = 1; j < 8 && i < bit_len; j++) {
             bytes[byte_index] = (bytes[byte_index] << 1) | (bitstring[i++] - '0');
-            printf("%02x %c\n", bytes[byte_index], bitstring[i]);
+            // printf("%02x %c\n", bytes[byte_index], bitstring[i]);
         }
-        printf("bytes[%d]= %02x\n", byte_index, bytes[byte_index]);
+        // printf("bytes[%d]= %02x\n", byte_index, bytes[byte_index]);
         byte_index ++;
     }
     bytes[byte_index] = '\0';  // 结束符
@@ -1058,6 +1058,9 @@ int importCipherText(CipherText *ciphertext,
 }
 
 //还需要校验等式4
+/*
+m_bytes_len = SHA256_DIGEST_LENGTH_32 + 1;
+*/
 int Dec2(uint8_t *pk_Hex, int pk_Hex_len, 
     uint8_t *sk_Hex, int sk_Hex_len, 
     uint8_t *w,
@@ -1065,19 +1068,35 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *c2_Hex, int c2_Hex_len,
     uint8_t *c3_Hex, int c3_Hex_len,
     uint8_t *c4_Hex, int c4_Hex_len,
-    uint8_t *m_bytes
+    uint8_t *m_bytes, int m_bytes_len
     )
 {
     printf("********************************\n");
     printf("**********Dec2 start************\n");
     printf("********************************\n");
     if(sk_Hex_len != (ZR_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) )
+       pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       m_bytes_len != (SHA256_DIGEST_LENGTH_32 + 1) || 
+       c1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       c2_Hex_len != (GT_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       c3_Hex_len != (SHA256_DIGEST_LENGTH_32 * 8 * 2) ||
+       c4_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2)
+       )
     {
         printf("sk_Hex_len = %d, sk_Hex_len should equal to  %d\n", 
             sk_Hex_len, ZR_ELEMENT_LENGTH_IN_BYTES * 2);
         printf("pk_Hex_len = %d, pk_Hex_len should equal to  %d\n", 
             pk_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("m_bytes_len = %d, m_bytes_len should equal to  %d\n", 
+            m_bytes_len, (SHA256_DIGEST_LENGTH_32 + 1));
+        printf("c1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
+            c1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("c2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
+            c2_Hex_len, GT_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("c3_Hex_len = %d, c3_Hex_len should equal to  %d\n", 
+            c3_Hex_len, SHA256_DIGEST_LENGTH_32 * 8 * 2);
+        printf("c4_Hex_len = %d, c4_Hex_len should equal to  %d\n", 
+            c4_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);  
         return -1;
     }
 
@@ -1159,23 +1178,47 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(c1_2, g, hash1result);
     if (element_cmp(c1_2, ciphertext.c1) != 0) {
         printf("verify g^H1(m, R) == c1 fail\n");
-        element_clear(hash1result);
         element_clear(c1_2);
-        element_clear(hash2result);
-        element_clear(eresult);
-        element_clear(R);
+        element_clear(hash1result);
+        free(m);
         free(hash3result);
+        element_clear(R);	
+        element_clear(eresult);
+        element_clear(hash2result);
+        element_clear(ciphertext.c1);
+        element_clear(ciphertext.c2);
+        free(ciphertext.c3)
+        element_clear(ciphertext.c4);
+        element_clear(keypair.sk);
+        element_clear(keypair.pk);
+        element_clear(Z);
+        element_clear(g);
+        pairing_clear(pairing);	
         // 处理错误，或返回 ⊥
         return NULL;
     }
     printf("verify g^H1(m, R) == c1 success\n");
+    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes);
+    printf("m_bytes = %s\n", m_bytes);
+ 
 
 
-
-    element_clear(hash2result);
-    element_clear(eresult);
-    element_clear(R);
+    element_clear(c1_2);
+    element_clear(hash1result);
+    free(m);
     free(hash3result);
+    element_clear(R);	
+    element_clear(eresult);
+    element_clear(hash2result);
+    element_clear(ciphertext.c1);
+    element_clear(ciphertext.c2);
+    free(ciphertext.c3)
+    element_clear(ciphertext.c4);
+    element_clear(keypair.sk);
+    element_clear(keypair.pk);
+    element_clear(Z);
+    element_clear(g);
+    pairing_clear(pairing);	
 
 
     printf("********************************\n");
@@ -1235,14 +1278,12 @@ int main() {
     }
     printf("\n");
 
-    
-    uint8_t *bytes=(uint8_t *)"1234567890abcd";
-    uint8_t bits[1024];
-    bytes_to_bits(bytes, strlen(bytes), bits);
-    printf("bits = %s\n", bits);
-    uint8_t bytes2[1024];
-    bits_to_bytes(bits, strlen(bits), bytes2);
-    printf("bytes2 = %s", bytes2);
 
+    uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
+    Dec2(pk_Hex, sizeof(pk_Hex), sk_Hex, sizeof(sk_Hex),
+        w, c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
+        c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
+        m_bytes, sizeof(m_bytes))
+    printf("main: m_bytes = %s\n", m_bytes);
     return 0;
 }
