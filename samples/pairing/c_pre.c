@@ -862,22 +862,6 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     //import pk
     element_init_G1(keypair.pk, pairing);
     importKeyPair(&keypair, pk_Hex, pk_Hex_len, NULL, 0);
-    // uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    // printf("pk_Hex=\n");
-    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-    //     printf("%c", (unsigned int)pk_Hex[i]);
-    // }
-    // printf("\n");
-    // int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
-    // printf("pk_bytes=\n");
-    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-    //     printf("%02x ", pk_bytes[i]);
-    // }
-    // printf("\n");
-
-    
-    // printf("ok0\n");
-    // int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
 
     printf("ok1\n");
     CipherText ciphertext;
@@ -1185,41 +1169,44 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     KeyPair keypair;
     Setup(pairing, g, Z);
 
-    //import pk
-    uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, pk_Hex=\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-        printf("%c", (unsigned int)pk_Hex[i]);
-    }
-    printf("\n");
-    int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
-    printf("after HexStrToByteStr, pk_bytes=\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", pk_bytes[i]);
-    }
-    printf("\n");
-
+    //import pk, sk
     element_init_G1(keypair.pk, pairing);
-
-    int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
-
-    //import sk
-    uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, sk_Hex=\n");
-    for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-        printf("%c", (unsigned int)sk_Hex[i]);
-    }
-    printf("\n");
-    iret = HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
-    printf("after HexStrToByteStr, sk_bytes=\n");
-    for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", sk_bytes[i]);
-    }
-    printf("\n");
-
     element_init_Zr(keypair.sk, pairing);
+    importKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
+    // uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    // printf("before HexStrToByteStr, pk_Hex=\n");
+    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+    //     printf("%c", (unsigned int)pk_Hex[i]);
+    // }
+    // printf("\n");
+    // int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
+    // printf("after HexStrToByteStr, pk_bytes=\n");
+    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+    //     printf("%02x ", pk_bytes[i]);
+    // }
+    // printf("\n");
 
-    int sk_len = element_from_bytes(keypair.sk, (uint8_t *)sk_bytes);
+    
+
+    // int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
+
+    // //import sk
+    // uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
+    // printf("before HexStrToByteStr, sk_Hex=\n");
+    // for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+    //     printf("%c", (unsigned int)sk_Hex[i]);
+    // }
+    // printf("\n");
+    // iret = HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
+    // printf("after HexStrToByteStr, sk_bytes=\n");
+    // for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
+    //     printf("%02x ", sk_bytes[i]);
+    // }
+    // printf("\n");
+
+    
+
+    // int sk_len = element_from_bytes(keypair.sk, (uint8_t *)sk_bytes);
 
     //import ciphertext
     CipherText ciphertext;
