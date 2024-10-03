@@ -34,7 +34,7 @@ typedef struct {
 
 
 // 函数声明
-void Setup(pairing_t pairing, element_t g, element_t Z, int *p_n);
+void Setup(pairing_t pairing, element_t g, element_t Z);
 void Hash1(element_t result, uint8_t* m, element_t R);
 void Hash2(element_t result, element_t pk, uint8_t* w);
 void Hash3(uint8_t* bitstring, element_t R);
