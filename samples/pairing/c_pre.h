@@ -28,7 +28,7 @@ typedef struct {
 typedef struct {
     element_t c1;   // 密文的第一部分
     element_t c2;   // 密文的第二部分
-    char *c3;       // 密文的第三部分（比特串）
+    uint8_t *c3;       // 密文的第三部分（比特串）
     element_t c4;   // 密文的第四部分
 } CipherText;
 

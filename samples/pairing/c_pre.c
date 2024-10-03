@@ -79,7 +79,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_bu
 }
 
 
-void bytes_to_bits( unsigned char *bytes, int byte_len, char *bitstring) {
+void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
     int i, j;
     int bit_index = 0;
     int n = byte_len * 8;
@@ -92,7 +92,7 @@ void bytes_to_bits( unsigned char *bytes, int byte_len, char *bitstring) {
 }
 
 //这里要求str1和str2的长度必须一致，否则会越界，这里都是256
-void xor_bitstrings(char *result, char *str1, char *str2) {
+void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
     int n = strlen(str1);
     for (int i = 0; i < n; i++) {
         // 逐位进行异或 ('0' 异或 '0' 为 '0', '0' 异或 '1' 为 '1', '1' 异或 '1' 为 '0')
@@ -127,7 +127,7 @@ sign0 1";
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
     (*p_n) = 50;
-    unsigned char g_bytes[1024];
+    uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
     element_to_bytes(g_bytes, g);
     printf("g_len = %d, g=\n", g_len);
@@ -135,7 +135,7 @@ sign0 1";
         printf("%02x ", g_bytes[i]);
     }
     printf("\n");
-    unsigned char Z_bytes[1024];
+    uint8_t Z_bytes[1024];
     size_t Z_len = element_length_in_bytes(Z);
     element_to_bytes(Z_bytes, Z);
     printf("Z_len = %d, Z=\n", Z_len);
@@ -149,21 +149,21 @@ sign0 1";
 
 //Hash1 {0,1}* -> Zq
 // 注意：m是以\0结束的字符串
-void Hash1(element_t result, char* m, element_t R)
+void Hash1(element_t result, uint8_t * m, element_t R)
 {
     int R_len = element_length_in_bytes(R);
-    unsigned char *R_bytes = (unsigned char *) malloc(R_len);
+    uint8_t *R_bytes = (uint8_t *) malloc(R_len);
     element_to_bytes(R_bytes, R);  // 序列化 GT 群中的元素 R
     
     // 获取输入字符串 m 的长度
     int m_len = strlen(m);
     
     // 合并 m 和 R_bytes
-    unsigned char *hash_input = (unsigned char *) malloc(m_len + R_len);
+    uint8_t *hash_input = (uint8_t *) malloc(m_len + R_len);
     memcpy(hash_input, m, m_len);
     memcpy(hash_input + m_len, R_bytes, R_len);
     
-    unsigned char hash[SHA256_DIGEST_LENGTH_32];
+    uint8_t hash[SHA256_DIGEST_LENGTH_32];
     sha256_context ctx;
     sha256_starts( &ctx );
     sha256_update( &ctx, (uint8 *) hash_input, m_len + R_len );
@@ -186,15 +186,15 @@ void Hash1(element_t result, char* m, element_t R)
 
 //Hash2 {0,1}* -> G1
 // 注意：w是以\0结束的字符串
-void Hash2(element_t result, element_t pk,  char* w) {
+void Hash2(element_t result, element_t pk,  uint8_t * w) {
 
     sha256_context ctx;
     sha256_starts( &ctx );
 
-    unsigned char hash[SHA256_DIGEST_LENGTH_32];
+    uint8_t hash[SHA256_DIGEST_LENGTH_32];
     size_t pk_len = element_length_in_bytes(pk);
     size_t w_len = strlen(w);
-    unsigned char hash_input = (unsigned char *) malloc(pk_len + w_len);
+    uint8_t hash_input = (uint8_t *) malloc(pk_len + w_len);
 
     // 将 pk 转换为字节形式
     element_to_bytes(hash_input, pk); 
@@ -213,13 +213,13 @@ void Hash2(element_t result, element_t pk,  char* w) {
 
 
 // Hash3 G1 -> {0,1}^n
-void Hash3(char *bitstring, element_t R){
+void Hash3(uint8_t *bitstring, element_t R){
     // 获取 G1 群元素 R 的字节表示
     int R_len = element_length_in_bytes(R);
-    unsigned char *R_bytes = (unsigned char *) malloc(R_len);
+    uint8_t *R_bytes = (uint8_t *) malloc(R_len);
     element_to_bytes(R_bytes, R);  // 序列化 G1 群中的元素 R
 
-    unsigned char hash[SHA256_DIGEST_LENGTH_32];
+    uint8_t hash[SHA256_DIGEST_LENGTH_32];
     sha256_context ctx;
     sha256_starts( &ctx );
     sha256_update( &ctx, (uint8 *) R_bytes, R_len );
@@ -231,7 +231,7 @@ void Hash3(char *bitstring, element_t R){
     free(R_bytes);
 }
 
-void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
+void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
     sha256_context ctx;
     sha256_starts( &ctx );
 
@@ -243,7 +243,7 @@ void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
     size_t c3_len = strlen(c3);
 
     // 分配足够大的缓冲区来存储 c1, c2 和 c3 的拼接结果
-    unsigned char * hash_input = (unsigned char *) malloc(c1_len + c2_len + c3_len);
+    uint8_t * hash_input = (uint8_t *) malloc(c1_len + c2_len + c3_len);
 
     // 将 c1 转换为字节形式
     element_to_bytes(hash_input, c1);
@@ -255,7 +255,7 @@ void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
     memcpy(hash_input + c1_len + c2_len, c3, c3_len);
 
     // 进行 SHA256 哈希
-    unsigned char hash[SHA256_DIGEST_LENGTH_32];
+    uint8_t hash[SHA256_DIGEST_LENGTH_32];
     sha256_update( &ctx, (uint8 *) hash_input, c1_len + c2_len + c3_len );
     sha256_finish( &ctx, hash );
 
@@ -651,7 +651,7 @@ void Hash4(element_t result, element_t c1, element_t c2,  char* c3) {
 // }
 
 
-int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int *p_sk_Hex_len)
+int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_len)
 {
     printf("********************************\n");
     printf("**********KeyGen start************\n");
@@ -663,7 +663,7 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
     KeyPair keypair;
     Setup(pairing, g, Z, &n);
 
-    unsigned char g_bytes[1024];
+    uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
     element_to_bytes(g_bytes, g);
     printf("g_len = %d, g=\n", g_len);
@@ -672,7 +672,7 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
     }
     printf("\n");
 
-    unsigned char hash[SHA256_DIGEST_LENGTH_32];
+    uint8_t hash[SHA256_DIGEST_LENGTH_32];
     sha256_context ctx;
     sha256_starts( &ctx );
     sha256_update( &ctx, (uint8 *) g_bytes, g_len );
@@ -706,8 +706,8 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
         return -1;
     }
     
-    unsigned char pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    unsigned char sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
 
     (*p_pk_Hex_len) = element_to_bytes(pk_bytes, keypair.pk);
     (*p_sk_Hex_len) = element_to_bytes(sk_bytes, keypair.sk);
@@ -753,9 +753,9 @@ int KeyGen(unsigned char *pk_Hex, int *p_pk_Hex_len, unsigned char *sk_Hex, int 
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
-int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len, 
-    unsigned char *m_bytes,
-    unsigned char *w)
+int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len, 
+    uint8_t *m_bytes,
+    uint8_t *w)
 {
     printf("********************************\n");
     printf("**********Enc2 start************\n");
@@ -769,7 +769,7 @@ int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len,
 
     //先把m_bytes转成bit
     int m_len = strlen(m_bytes) * 8 + 1;
-    char *m = (char *)malloc(m_len);
+    uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, strlen(m_bytes), m);
 
     pairing_t pairing;
@@ -794,14 +794,14 @@ int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len,
     printf("\n");
 
     element_init_G1(keypair.pk, pairing);
-    int pk_len = element_from_bytes(keypair.pk, (unsigned char *)pk_bytes);
+    int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
 
     CipherText ciphertext;
     element_init_G1(ciphertext.c1, pairing);
     element_init_GT(ciphertext.c2, pairing);
     element_init_G1(ciphertext.c4, pairing);
     // 为 ciphertext.c3 分配内存
-    ciphertext.c3 = (char *) malloc(n + 1);
+    ciphertext.c3 = (uint8_t *) malloc(n + 1);
     element_t R, r, hash2result, eresult, hash4result;
     element_init_GT(R, pairing);
     element_random(R);
@@ -824,7 +824,7 @@ int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len,
     element_mul(ciphertext.c2, R, eresult);
     
     //最后以\0结束，这里需要修改，hash3result应该是256 + 1
-    char *hash3result = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
     //get c3
     xor_bitstrings(ciphertext.c3, m, hash3result);
@@ -862,8 +862,8 @@ int Enc2(unsigned char *pk_Hex_bytes, int pk_Hex_bytes_len,
 
 int main() {
 
-    unsigned char pk_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    unsigned char sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t pk_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
     int pk_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
     int sk_Hex_len = ZR_ELEMENT_LENGTH_IN_BYTES * 2;
 
@@ -880,8 +880,8 @@ int main() {
     }
     printf("\n");
 
-    unsigned char *m="12345678901234567890123456789012";
-    unsigned char *w="hello world";
+    uint8_t *m="12345678901234567890123456789012";
+    uint8_t *w="hello world";
     Enc2(pk_Hex, pk_Hex_len, m, w);
 
 
