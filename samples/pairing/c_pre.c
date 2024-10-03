@@ -981,7 +981,7 @@ int main() {
     }
     printf("\n");
     printf("c4:\n");
-    for(int i=0;i<sizeof(c41_Hex);i++) {
+    for(int i=0;i<sizeof(c4_Hex);i++) {
         printf("%c", c4_Hex[i]);
     }
     printf("\n");
