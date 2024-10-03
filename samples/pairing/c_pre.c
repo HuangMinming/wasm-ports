@@ -84,12 +84,14 @@ void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
     int n = bit_len / 8;
     for (i = 0; i < bit_len && byte_index < n; i++) {
         bytes[byte_index]= bitstring[i++] - '0';
-        for (j = 1; j < 8 && byte_index < n; j++) {
+        printf("%02x\n", bytes[byte_index]);
+        for (j = 1; j < 8; j++) {
             bytes[byte_index] = (bytes[byte_index] < 1) | (bitstring[i++] - '0');
+            printf("%02x\n", bytes[byte_index]);
         }
         byte_index ++;
     }
-    bitstring[byte_index] = '\0';  // 结束符
+    bytes[byte_index] = '\0';  // 结束符
 }
 
 void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
@@ -1235,7 +1237,7 @@ int main() {
     uint8_t *bytes=(uint8_t *)"1234567890abcd";
     uint8_t bits[1024];
     bytes_to_bits(bytes, strlen(bytes), bits);
-    printf("bits = %s", bits);
+    printf("bits = %s\n", bits);
     uint8_t bytes2[1024];
     bits_to_bytes(bits, strlen(bits), bytes2);
     printf("bytes2 = %s", bytes2);
