@@ -85,7 +85,7 @@ void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
     for (i = 0; i < bit_len && byte_index < n; i++) {
         bytes[byte_index]= bitstring[i++] - '0';
         for (j = 1; j < 8 && byte_index < n; j++) {
-            bytes[byte_index] = (bytes[byte_index] < 1) | (bitstring[i++] - '0')
+            bytes[byte_index] = (bytes[byte_index] < 1) | (bitstring[i++] - '0');
         }
         byte_index ++;
     }
@@ -1144,7 +1144,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    xor_bitstrings(m, CipherText.c3, hash3result);
+    xor_bitstrings(m, ciphertext.c3, hash3result);
 
     //verify g^H1(m, R) == C1
     element_t hash1result;
@@ -1165,7 +1165,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         return NULL;
     }
     printf("verify g^H1(m, R) == c1 success\n");
-    m_bytes
+
 
 
     element_clear(hash2result);
