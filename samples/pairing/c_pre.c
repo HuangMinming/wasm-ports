@@ -869,7 +869,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_t g;
     element_t Z;
     KeyPair keypair;
-    Setup(pairing, g, Z);
+    iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
         printf("Setup return %d, exit", iRet);
@@ -929,7 +929,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     //get c3, c3以\0结束
     xor_bitstrings(ciphertext.c3, m, hash3result);
     printf("length(ciphertext.c3) = %d, ciphertext.c3 = %s\n", 
-        strlen(ciphertext.c3), ciphertext.c3);
+        strlen((const char *)ciphertext.c3), ciphertext.c3);
 
 
     //hash4result在调用Hash4前需要完成初始化
@@ -1185,7 +1185,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_t g;
     element_t Z;
     KeyPair keypair;
-    Setup(pairing, g, Z);
+    iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
         printf("Setup return %d, exit", iRet);
@@ -1265,7 +1265,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         element_clear(g);
         pairing_clear(pairing);	
         // 处理错误，或返回 ⊥
-        return NULL;
+        return -1;
     }
     printf("verify g^H1(m, R) == c1 success\n");
     bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes);
