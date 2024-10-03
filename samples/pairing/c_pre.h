@@ -35,10 +35,10 @@ typedef struct {
 
 // 函数声明
 void Setup(pairing_t pairing, element_t g, element_t Z, int *p_n);
-void Hash1(element_t result, char* m, element_t R);
-void Hash2(element_t result, element_t pk, char* w);
-void Hash3(char* bitstring, element_t R);
-void Hash4(element_t result, element_t c1, element_t c2, char* c3);
+void Hash1(element_t result, uint8_t* m, element_t R);
+void Hash2(element_t result, element_t pk, uint8_t* w);
+void Hash3(uint8_t* bitstring, element_t R);
+void Hash4(element_t result, element_t c1, element_t c2, uint8_t* c3);
 
 // void bytes_to_bits(unsigned char* bytes, int byte_len, char* bitstring, int n);
 // void xor_bitstrings(char* result, char* str1, char* str2);

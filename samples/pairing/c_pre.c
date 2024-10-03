@@ -93,7 +93,7 @@ void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
 
 //这里要求str1和str2的长度必须一致，否则会越界，这里都是256
 void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
-    int n = strlen(str1);
+    int n = strlen((const char *)str1);
     for (int i = 0; i < n; i++) {
         // 逐位进行异或 ('0' 异或 '0' 为 '0', '0' 异或 '1' 为 '1', '1' 异或 '1' 为 '0')
         if (str1[i] == str2[i]) {
@@ -156,7 +156,7 @@ void Hash1(element_t result, uint8_t * m, element_t R)
     element_to_bytes(R_bytes, R);  // 序列化 GT 群中的元素 R
     
     // 获取输入字符串 m 的长度
-    int m_len = strlen(m);
+    int m_len = strlen((const char *)m);
     
     // 合并 m 和 R_bytes
     uint8_t *hash_input = (uint8_t *) malloc(m_len + R_len);
@@ -193,8 +193,8 @@ void Hash2(element_t result, element_t pk,  uint8_t * w) {
 
     uint8_t hash[SHA256_DIGEST_LENGTH_32];
     size_t pk_len = element_length_in_bytes(pk);
-    size_t w_len = strlen(w);
-    uint8_t hash_input = (uint8_t *) malloc(pk_len + w_len);
+    size_t w_len = strlen((const char *)w);
+    uint8_t * hash_input = (uint8_t *) malloc(pk_len + w_len);
 
     // 将 pk 转换为字节形式
     element_to_bytes(hash_input, pk); 
@@ -240,7 +240,7 @@ void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
     // 获取 GT 群元素 c2 的字节长度
     size_t c2_len = element_length_in_bytes(c2);
     // 获取 c3 的长度
-    size_t c3_len = strlen(c3);
+    size_t c3_len = strlen((const char *)c3);
 
     // 分配足够大的缓冲区来存储 c1, c2 和 c3 的拼接结果
     uint8_t * hash_input = (uint8_t *) malloc(c1_len + c2_len + c3_len);
@@ -770,7 +770,7 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     //先把m_bytes转成bit
     int m_len = strlen(m_bytes) * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
-    bytes_to_bits(m_bytes, strlen(m_bytes), m);
+    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
 
     pairing_t pairing;
     element_t g;
