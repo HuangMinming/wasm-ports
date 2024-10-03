@@ -768,7 +768,7 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     }
 
     //先把m_bytes转成bit
-    int m_len = strlen(m_bytes) * 8 + 1;
+    int m_len = strlen((const char *)m_bytes) * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
 
@@ -880,8 +880,8 @@ int main() {
     }
     printf("\n");
 
-    uint8_t *m="12345678901234567890123456789012";
-    uint8_t *w="hello world";
+    uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
+    uint8_t *w=(uint8_t *)"hello world";
     Enc2(pk_Hex, pk_Hex_len, m, w);
 
 
