@@ -122,8 +122,9 @@ void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
     result[n] = '\0';  // 确保字符串以 '\0' 结束
 }
 
-void Setup(pairing_t pairing, element_t g, element_t Z)
+int Setup(pairing_t pairing, element_t g, element_t Z)
 {
+    int iRet = -1;
     char *param="type a\n\
 q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\n\
 h 12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776\n\
@@ -137,7 +138,11 @@ sign0 1";
     //     pbc_die("input error");
     size_t count = strlen(param);
     printf("count=%d\n", count);
-    pairing_init_set_buf(pairing, param, count);
+    iRet = pairing_init_set_buf(pairing, param, count);
+    if (iRet != 0) {
+        printf("pairing_init_set_buf return %d, exit\n", iRet);
+        return -1;
+    }
     element_init_G1(g, pairing);
     // element_random(g);
     element_from_hash(g, "31415926", strlen("31415926"));
@@ -159,8 +164,7 @@ sign0 1";
         printf("%02x ", Z_bytes[i]);
     }
     printf("\n");
-
-    
+    return 0;    
 }
 
 //Hash1 {0,1}* -> Zq
@@ -672,11 +676,17 @@ int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_le
     printf("********************************\n");
     printf("**********KeyGen start************\n");
     printf("********************************\n");
+    int iRet = -1;
     pairing_t pairing;
     element_t g;
     element_t Z;
     KeyPair keypair;
-    Setup(pairing, g, Z);
+    iRet = Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
 
     uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
@@ -785,7 +795,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
             printf("%c", (unsigned int)pk_Hex[i]);
         }
         printf("\n");
-        int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
+        HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
         printf("after HexStrToByteStr, pk_bytes=\n");
         for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
             printf("%02x ", pk_bytes[i]);
@@ -811,7 +821,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
             printf("%c", (unsigned int)sk_Hex[i]);
         }
         printf("\n");
-        int iret = HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
+        HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
         printf("after HexStrToByteStr, sk_bytes=\n");
         for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
             printf("%02x ", sk_bytes[i]);
@@ -826,6 +836,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
     printf("********************************\n");
     printf("**********importKeyPair end************\n");
     printf("********************************\n");
+    return 0;
 }
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
@@ -846,6 +857,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
         printf("pk_Hex_len should equal to  %d\n", G1_ELEMENT_LENGTH_IN_BYTES * 2);
         return -1;
     }
+    int iRet = -1;
 
     //先把m_bytes转成bit
     int m_len = strlen((const char *)m_bytes) * 8 + 1;
@@ -858,6 +870,11 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_t Z;
     KeyPair keypair;
     Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
 
     //import pk
     element_init_G1(keypair.pk, pairing);
@@ -1013,7 +1030,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     return 0;
 }
 
-int importCipherText(CipherText *ciphertext, 
+int importCipherText(CipherText *p_ciphertext, 
     uint8_t *c1_Hex, int c1_Hex_len,
     uint8_t *c2_Hex, int c2_Hex_len,
     uint8_t *c3_Hex, int c3_Hex_len,
@@ -1045,7 +1062,7 @@ int importCipherText(CipherText *ciphertext,
         printf("%c", (unsigned int)c1_Hex[i]);
     }
     printf("\n");
-    int iret = HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes);
+    HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes);
     printf("after HexStrToByteStr, c1_bytes=\n");
     for(int i=0;i<c1_Hex_len/2;i++) {
         printf("%02x ", c1_bytes[i]);
@@ -1054,7 +1071,7 @@ int importCipherText(CipherText *ciphertext,
 
     //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
     // element_init_G1(ciphertext->c1, pairing); 
-    int c1_len = element_from_bytes(ciphertext->c1, (uint8_t *)c1_bytes);
+    int c1_len = element_from_bytes(p_ciphertext->c1, (uint8_t *)c1_bytes);
 
     //import c2
     uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
@@ -1063,7 +1080,7 @@ int importCipherText(CipherText *ciphertext,
         printf("%c", (unsigned int)c2_Hex[i]);
     }
     printf("\n");
-    iret = HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes);
+    HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes);
     printf("after HexStrToByteStr, c2_bytes=\n");
     for(int i=0;i<c2_Hex_len/2;i++) {
         printf("%02x ", c2_bytes[i]);
@@ -1072,7 +1089,7 @@ int importCipherText(CipherText *ciphertext,
 
     //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
     // element_init_GT(ciphertext->c2, pairing); 
-    int c2_len = element_from_bytes(ciphertext->c2, (uint8_t *)c2_bytes);
+    int c2_len = element_from_bytes(p_ciphertext->c2, (uint8_t *)c2_bytes);
 
     //import c3
     uint8_t c3_bytes[SHA256_DIGEST_LENGTH_32 * 8];
@@ -1081,7 +1098,7 @@ int importCipherText(CipherText *ciphertext,
         printf("%c", (unsigned int)c3_Hex[i]);
     }
     printf("\n");
-    iret = HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes);
+    HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes);
     printf("after HexStrToByteStr, c3_bytes=\n");
     for(int i=0;i<c3_Hex_len/2;i++) {
         printf("%02x ", c3_bytes[i]);
@@ -1089,9 +1106,9 @@ int importCipherText(CipherText *ciphertext,
     printf("\n");
 
     //ciphertext需要在调用importCipherText前完成初始化
-    memcpy(ciphertext->c3, c3_bytes, SHA256_DIGEST_LENGTH_32 * 8);
+    memcpy(p_ciphertext->c3, c3_bytes, SHA256_DIGEST_LENGTH_32 * 8);
     //确保c3 已\0结束
-    ciphertext->c3[SHA256_DIGEST_LENGTH_32 * 8] = '\0';
+    p_ciphertext->c3[SHA256_DIGEST_LENGTH_32 * 8] = '\0';
 
 
     //import c4
@@ -1101,7 +1118,7 @@ int importCipherText(CipherText *ciphertext,
         printf("%c", (unsigned int)c4_Hex[i]);
     }
     printf("\n");
-    iret = HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes);
+    HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes);
     printf("after HexStrToByteStr, c4_bytes=\n");
     for(int i=0;i<c4_Hex_len/2;i++) {
         printf("%02x ", c4_bytes[i]);
@@ -1110,7 +1127,7 @@ int importCipherText(CipherText *ciphertext,
 
     //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
     // element_init_G1(ciphertext->c4, pairing); 
-    int c4_len = element_from_bytes(ciphertext->c4, (uint8_t *)c4_bytes);
+    int c4_len = element_from_bytes(p_ciphertext->c4, (uint8_t *)c4_bytes);
 
 
 
@@ -1162,51 +1179,23 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
             c4_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);  
         return -1;
     }
+    int iRet = -1;
 
     pairing_t pairing;
     element_t g;
     element_t Z;
     KeyPair keypair;
     Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
 
-    //import pk, sk
+    //import pk, sk，需要先完成初始化
     element_init_G1(keypair.pk, pairing);
     element_init_Zr(keypair.sk, pairing);
     importKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
-    // uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    // printf("before HexStrToByteStr, pk_Hex=\n");
-    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-    //     printf("%c", (unsigned int)pk_Hex[i]);
-    // }
-    // printf("\n");
-    // int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
-    // printf("after HexStrToByteStr, pk_bytes=\n");
-    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-    //     printf("%02x ", pk_bytes[i]);
-    // }
-    // printf("\n");
-
-    
-
-    // int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
-
-    // //import sk
-    // uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
-    // printf("before HexStrToByteStr, sk_Hex=\n");
-    // for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-    //     printf("%c", (unsigned int)sk_Hex[i]);
-    // }
-    // printf("\n");
-    // iret = HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
-    // printf("after HexStrToByteStr, sk_bytes=\n");
-    // for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
-    //     printf("%02x ", sk_bytes[i]);
-    // }
-    // printf("\n");
-
-    
-
-    // int sk_len = element_from_bytes(keypair.sk, (uint8_t *)sk_bytes);
 
     //import ciphertext
     CipherText ciphertext;
@@ -1215,7 +1204,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_G1(ciphertext.c4, pairing);
     // 为 ciphertext.c3 分配内存
     ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    int iret = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
+    iRet = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
         c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
         c4_Hex, c4_Hex_len);
 
@@ -1366,5 +1355,7 @@ int main() {
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
         m_bytes, sizeof(m_bytes));
     printf("main: m_bytes = %s\n", m_bytes);
+
+
     return 0;
 }
