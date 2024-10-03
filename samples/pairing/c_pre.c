@@ -794,14 +794,16 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     printf("\n");
 
     element_init_G1(keypair.pk, pairing);
+    printf("ok0\n");
     int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
-
+    printf("ok1\n");
     CipherText ciphertext;
     element_init_G1(ciphertext.c1, pairing);
     element_init_GT(ciphertext.c2, pairing);
     element_init_G1(ciphertext.c4, pairing);
+    printf("ok2\n");
     // 为 ciphertext.c3 分配内存
-    ciphertext.c3 = (uint8_t *) malloc(n + 1);
+    ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     element_t R, r, hash2result, eresult, hash4result;
     element_init_GT(R, pairing);
     element_random(R);
@@ -810,12 +812,14 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     
     //m是以\0结束的字符串
     Hash1(r, m, R); 
+    printf("ok3\n");
     //get c1
     element_pow_zn(ciphertext.c1, g, r);
 
     //hash2result在调用Hash2前需要完成初始化，w是以\0结束的字符串
     element_init_G1(hash2result, pairing);
     Hash2(hash2result, keypair.pk, w);
+    printf("ok4\n");
 
     element_init_GT(eresult, pairing);
     element_pairing(eresult, keypair.pk, hash2result);
@@ -826,12 +830,14 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     //最后以\0结束，这里需要修改，hash3result应该是256 + 1
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
+    printf("ok5\n");
     //get c3
     xor_bitstrings(ciphertext.c3, m, hash3result);
 
     //hash4result在调用Hash4前需要完成初始化
     element_init_G1(hash4result, pairing);
     Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3);
+    printf("ok6\n");
     //get c4
     element_pow_zn(ciphertext.c4, hash4result, r);
 
