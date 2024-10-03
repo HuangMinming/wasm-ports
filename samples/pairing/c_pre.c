@@ -765,6 +765,69 @@ int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_le
     return 0;
 }
 
+int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len, 
+    uint8_t *sk_Hex, int sk_Hex_len)
+{
+    printf("********************************\n");
+    printf("**********importKeyPair start************\n");
+    printf("********************************\n");
+    if(pk_Hex != NULL)
+    {
+        if(pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2))
+        {
+            printf("pk_Hex_len = %d, pk_Hex_len should equal to  %d\n", 
+            pk_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        }
+        //import pk
+        uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+        printf("before HexStrToByteStr, pk_Hex=\n");
+        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+            printf("%c", (unsigned int)pk_Hex[i]);
+        }
+        printf("\n");
+        int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
+        printf("after HexStrToByteStr, pk_bytes=\n");
+        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+            printf("%02x ", pk_bytes[i]);
+        }
+        printf("\n");
+
+        //在调用importKeyPair前完成初始化
+        // element_init_G1(keypair.pk, pairing); 
+        int pk_len = element_from_bytes(p_kepair->pk, (uint8_t *)pk_bytes);
+    }
+
+    if(sk_Hex != NULL)
+    {
+        if(sk_Hex_len != (ZR_ELEMENT_LENGTH_IN_BYTES * 2))
+        {
+            printf("sk_Hex_len = %d, sk_Hex_len should equal to  %d\n", 
+            sk_Hex_len, ZR_ELEMENT_LENGTH_IN_BYTES * 2);
+        }
+        //import sk
+        uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
+        printf("before HexStrToByteStr, sk_Hex=\n");
+        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+            printf("%c", (unsigned int)sk_Hex[i]);
+        }
+        printf("\n");
+        int iret = HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
+        printf("after HexStrToByteStr, sk_bytes=\n");
+        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
+            printf("%02x ", sk_bytes[i]);
+        }
+        printf("\n");
+
+        //在调用importKeyPair前完成初始化
+        // element_init_Zr(keypair.sk, pairing); 
+        int pk_len = element_from_bytes(p_kepair->sk, (uint8_t *)sk_bytes);
+    }
+    
+    printf("********************************\n");
+    printf("**********importKeyPair end************\n");
+    printf("********************************\n");
+}
+
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
 //输出c1,c2,c3,c4，其中c1, c2, c4转为bytes后再转为Hex,c3直接转为Hex，所有长度都是固定的，无需输出
@@ -797,22 +860,25 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     Setup(pairing, g, Z);
 
     //import pk
-    uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("pk_Hex=\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-        printf("%c", (unsigned int)pk_Hex[i]);
-    }
-    printf("\n");
-    int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
-    printf("pk_bytes=\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", pk_bytes[i]);
-    }
-    printf("\n");
-
     element_init_G1(keypair.pk, pairing);
-    printf("ok0\n");
-    int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
+    importKeyPair(&keypair, uint8_t *pk_Hex, int pk_Hex_len, NULL, 0);
+    // uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    // printf("pk_Hex=\n");
+    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
+    //     printf("%c", (unsigned int)pk_Hex[i]);
+    // }
+    // printf("\n");
+    // int iret = HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
+    // printf("pk_bytes=\n");
+    // for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+    //     printf("%02x ", pk_bytes[i]);
+    // }
+    // printf("\n");
+
+    
+    // printf("ok0\n");
+    // int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
+
     printf("ok1\n");
     CipherText ciphertext;
     element_init_G1(ciphertext.c1, pairing);
