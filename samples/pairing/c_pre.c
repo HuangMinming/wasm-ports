@@ -1215,7 +1215,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_G1(ciphertext.c4, pairing);
     // 为 ciphertext.c3 分配内存
     ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    iret = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
+    int iret = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
         c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
         c4_Hex, c4_Hex_len);
 
