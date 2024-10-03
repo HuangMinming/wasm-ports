@@ -219,7 +219,7 @@ void Hash2(element_t result, element_t pk,  uint8_t * w) {
     // 将 pk 转换为字节形式
     element_to_bytes(hash_input, pk); 
 
-    // 将 w 也转换为字节形式，并拼接到 combined_input 中
+    // 将 w 也转换为字节形式，并拼接到 hash_input 中
     memcpy(hash_input + pk_len, w, w_len);
 
     sha256_update( &ctx, (uint8 *) hash_input, pk_len + w_len );
@@ -1137,6 +1137,33 @@ int importCipherText(CipherText *p_ciphertext,
     return 0;
 }
 
+int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
+{
+    element_t e1, e2, hash4result;
+    element_init_GT(e1);
+    element_init_GT(e2);
+    element_init_G1(hash4result, pairing);
+
+    
+    Hash4(hash4result, p_ciphertext->c1, p_ciphertext->c2, p_ciphertext->c3);
+    pairing_apply(e1, p_ciphertext->c1, hash4result, pairing);
+    pairing_apply(e2, g, p_ciphertext->c4, pairing);
+    if (element_cmp(e1, e2) != 0) 
+    {
+        printf("e(C1, H4(C1,C2,C3)) = e(g, C4) check fail\n");
+        element_clear(hash4result);
+        element_clear(e2);
+        element_clear(e1);
+        return -1;
+    }
+    printf("e(C1, H4(C1,C2,C3)) = e(g, C4) check success\n");
+
+    element_clear(hash4result);
+    element_clear(e2);
+    element_clear(e1);
+    return 0;
+}
+
 //还需要校验等式4
 /*
 m_bytes_len = SHA256_DIGEST_LENGTH_32 + 1;
@@ -1192,11 +1219,6 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         return -1;
     }
 
-    //import pk, sk，需要先完成初始化
-    element_init_G1(keypair.pk, pairing);
-    element_init_Zr(keypair.sk, pairing);
-    importKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
-
     //import ciphertext
     CipherText ciphertext;
     element_init_G1(ciphertext.c1, pairing);
@@ -1207,6 +1229,18 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     iRet = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
         c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
         c4_Hex, c4_Hex_len);
+
+    iRet = checkEqual4(pairing, pairing, &ciphertext);
+    if(iRet != 0) 
+    {
+        printf("checkEqual4 return %d, exit", iRet);
+        return -1;
+    }
+
+    //import pk, sk，需要先完成初始化
+    element_init_G1(keypair.pk, pairing);
+    element_init_Zr(keypair.sk, pairing);
+    importKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
 
     element_t hash2result, eresult, R;
     element_init_G1(hash2result, pairing);
