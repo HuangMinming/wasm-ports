@@ -1124,7 +1124,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     }
     printf("\n");
 
-    element_init_Zr(keypair.pk, pairing);
+    element_init_G1(keypair.pk, pairing);
 
     int pk_len = element_from_bytes(keypair.pk, (uint8_t *)pk_bytes);
 
