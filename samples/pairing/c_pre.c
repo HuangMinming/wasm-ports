@@ -87,7 +87,7 @@ void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
         bytes[byte_index]= bitstring[i++] - '0';
         printf("%02x %c\n", bytes[byte_index],bitstring[i]);     
         for (j = 1; j < 8 && i < bit_len; j++) {
-            bytes[byte_index] = (bytes[byte_index] < 1) | (bitstring[i++] - '0');
+            bytes[byte_index] = (bytes[byte_index] << 1) | (bitstring[i++] - '0');
             printf("%02x %c\n", bytes[byte_index], bitstring[i]);
         }
         byte_index ++;
