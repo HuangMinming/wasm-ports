@@ -859,8 +859,11 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     printf("hash3result: %s\n",hash3result);
 
     printf("ok5\n");
-    //get c3
+    //get c3, c3以\0结束
     xor_bitstrings(ciphertext.c3, m, hash3result);
+    printf("length(ciphertext.c3) = %d, ciphertext.c3 = %s\n", 
+        strlen(ciphertext.c3), ciphertext.c3);
+
 
     //hash4result在调用Hash4前需要完成初始化
     element_init_G1(hash4result, pairing);
@@ -1037,6 +1040,8 @@ int importCipherText(CipherText *ciphertext,
 
     //ciphertext需要在调用importCipherText前完成初始化
     memcpy(ciphertext->c3, c3_bytes, SHA256_DIGEST_LENGTH_32 * 8);
+    //确保c3 已\0结束
+    ciphertext->c3[SHA256_DIGEST_LENGTH_32 * 8] = '\0';
 
 
     //import c4
