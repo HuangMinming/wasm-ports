@@ -753,9 +753,12 @@ int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_le
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
+//输出c1,c2,c3,c4，其中c1, c2, c4转为bytes后再转为Hex,c3直接转为Hex，所有长度都是固定的，无需输出
 int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len, 
     uint8_t *m_bytes,
-    uint8_t *w)
+    uint8_t *w,
+    uint8_t *c1_Hex, uint8_t *c2_Hex, uint8_t *c3_Hex, uint8_t *c4_Hex
+    )
 {
     printf("********************************\n");
     printf("**********Enc2 start************\n");
@@ -841,6 +844,74 @@ int Enc2(uint8_t *pk_Hex_bytes, int pk_Hex_bytes_len,
     //get c4
     element_pow_zn(ciphertext.c4, hash4result, r);
 
+    //c1, c2, c4 conver to bytes
+    int c1_len = element_length_in_bytes(ciphertext.c1);
+    int c2_len = element_length_in_bytes(ciphertext.c2);
+    int c4_len = element_length_in_bytes(ciphertext.c4);
+    if (c1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
+        c2_len != GT_ELEMENT_LENGTH_IN_BYTES ||
+        c4_len != G1_ELEMENT_LENGTH_IN_BYTES)
+    {
+        printf("c1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c1_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("c2_len = %d, GT_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c2_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("c4_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c4_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("exit \n");
+        free(m);
+        element_clear(R);
+        element_clear(r);
+        element_clear(hash2result);
+        element_clear(eresult);
+        element_clear(hash4result);
+        free(hash3result);
+        element_clear(ciphertext.c4);
+        free(ciphertext.c3);
+        element_clear(ciphertext.c2);
+        element_clear(ciphertext.c1);
+        element_clear(keypair.pk);
+        element_clear(Z);
+        element_clear(g);
+        pairing_clear(pairing);
+        return -1;
+    }
+    uint8_t c1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+
+    element_to_bytes(c1_bytes, ciphertext.c1);
+    element_to_bytes(c2_bytes, ciphertext.c1);
+    element_to_bytes(c4_bytes, ciphertext.c1);
+    printf("c1:\n");
+    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c1_bytes[i]);
+    }
+    printf("\n");
+    printf("c2:\n");
+    for(int i=0;i<GT_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c2_bytes[i]);
+    }
+    printf("\n");
+    printf("c3:\n");
+    for(int i=0;i<SHA256_DIGEST_LENGTH_32 * 8;i++) {
+        printf("%02x ", ciphertext.c3[i]);
+    }
+    printf("\n");
+    printf("c4:\n");
+    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c4_bytes[i]);
+    }
+    printf("\n");
+
+    //c1, c2, c3, c4 convert to Hex
+    ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex);
+    ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
+    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c1_Hex);
+    ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
+
+
+
     free(m);
     element_clear(R);
     element_clear(r);
@@ -888,7 +959,32 @@ int main() {
 
     uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
     uint8_t *w=(uint8_t *)"hello world";
-    Enc2(pk_Hex, pk_Hex_len, m, w);
+    uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    Enc2(pk_Hex, pk_Hex_len, m, w, c1_Hex,c2_Hex,c3_Hex,c4_Hex);
+
+    printf("c1:\n");
+    for(int i=0;i<sizeof(c1_Hex);i++) {
+        printf("%c", c1_Hex[i]);
+    }
+    printf("\n");
+    printf("c2:\n");
+    for(int i=0;i<sizeof(c2_Hex);i++) {
+        printf("%c", c2_Hex[i]);
+    }
+    printf("\n");
+    printf("c3:\n");
+    for(int i=0;i<sizeof(c3_Hex);i++) {
+        printf("%c", c3_Hex[i]);
+    }
+    printf("\n");
+    printf("c4:\n");
+    for(int i=0;i<sizeof(c41_Hex);i++) {
+        printf("%c", c4_Hex[i]);
+    }
+    printf("\n");
 
 
     return 0;

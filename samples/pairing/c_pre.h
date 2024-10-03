@@ -16,20 +16,20 @@
 
 // 结构体定义
 typedef struct {
-    element_t pk;   // 公钥
-    element_t sk;   // 私钥
+    element_t pk;   // 公钥 G1
+    element_t sk;   // 私钥 Zr
 } KeyPair;
 
 typedef struct {
-    element_t rk1;  // 重加密密钥 rk1
-    element_t rk2;  // 重加密密钥 rk2
+    element_t rk1;  // 重加密密钥 rk1  G1
+    element_t rk2;  // 重加密密钥 rk2  G1
 } ReKeyPair;
 
 typedef struct {
-    element_t c1;   // 密文的第一部分
-    element_t c2;   // 密文的第二部分
+    element_t c1;   // 密文的第一部分 G1
+    element_t c2;   // 密文的第二部分 GT
     uint8_t *c3;       // 密文的第三部分（比特串）
-    element_t c4;   // 密文的第四部分
+    element_t c4;   // 密文的第四部分  G1
 } CipherText;
 
 
