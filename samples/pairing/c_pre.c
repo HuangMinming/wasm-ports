@@ -1140,8 +1140,8 @@ int importCipherText(CipherText *p_ciphertext,
 int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
 {
     element_t e1, e2, hash4result;
-    element_init_GT(e1);
-    element_init_GT(e2);
+    element_init_GT(e1, pairing);
+    element_init_GT(e2, pairing);
     element_init_G1(hash4result, pairing);
 
     
@@ -1230,7 +1230,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
         c4_Hex, c4_Hex_len);
 
-    iRet = checkEqual4(pairing, pairing, &ciphertext);
+    iRet = checkEqual4(pairing, g, &ciphertext);
     if(iRet != 0) 
     {
         printf("checkEqual4 return %d, exit", iRet);
