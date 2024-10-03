@@ -122,7 +122,7 @@ void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
     result[n] = '\0';  // 确保字符串以 '\0' 结束
 }
 
-void Setup(pairing_t pairing, element_t g, element_t Z, int *p_n)
+void Setup(pairing_t pairing, element_t g, element_t Z)
 {
     char *param="type a\n\
 q 8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791\n\
@@ -143,7 +143,6 @@ sign0 1";
     element_from_hash(g, "31415926", strlen("31415926"));
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
-    (*p_n) = 50;
     uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
     element_to_bytes(g_bytes, g);
@@ -676,9 +675,8 @@ int KeyGen(uint8_t *pk_Hex, int *p_pk_Hex_len, uint8_t *sk_Hex, int *p_sk_Hex_le
     pairing_t pairing;
     element_t g;
     element_t Z;
-    int n;
     KeyPair keypair;
-    Setup(pairing, g, Z, &n);
+    Setup(pairing, g, Z);
 
     uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
@@ -796,9 +794,8 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     pairing_t pairing;
     element_t g;
     element_t Z;
-    int n;
     KeyPair keypair;
-    Setup(pairing, g, Z, &n);
+    Setup(pairing, g, Z);
 
     //import pk
     uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
@@ -841,6 +838,13 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_G1(hash2result, pairing);
     Hash2(hash2result, keypair.pk, w);
     printf("ok4\n");
+    uint8_t hash2result_bytes[8196];
+    int len = element_to_bytes(hash2result_bytes, hash2result); 
+    printf("hash2result_bytes:\n");
+    for(int i=0;i<len;i++) {
+        printf("%02x ", hash2result_bytes[i]);
+    }
+    printf("\n");
 
     element_init_GT(eresult, pairing);
     element_pairing(eresult, keypair.pk, hash2result);
@@ -1104,9 +1108,8 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     pairing_t pairing;
     element_t g;
     element_t Z;
-    int n;
     KeyPair keypair;
-    Setup(pairing, g, Z, &n);
+    Setup(pairing, g, Z);
 
     //import pk
     uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
@@ -1161,6 +1164,17 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_GT(R, pairing);
 
     Hash2(hash2result, keypair.pk, w);
+
+    uint8_t hash2result_bytes[8196];
+    int len = element_to_bytes(hash2result_bytes, hash2result); 
+    printf("hash2result_bytes:\n");
+    for(int i=0;i<len;i++) {
+        printf("%02x ", hash2result_bytes[i]);
+    }
+    printf("\n");
+
+
+
     element_pairing(eresult, ciphertext.c1, hash2result);
     element_pow_zn(eresult, eresult, keypair.sk);
     element_invert(eresult, eresult);
