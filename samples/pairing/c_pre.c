@@ -1400,6 +1400,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     //import pk, sk，需要先完成初始化
     KeyPair keypair_i, keypair_j;
     element_init_Zr(keypair_i.sk, pairing);
+    element_init_G1(keypair_i.pk, pairing);
     element_init_G1(keypair_j.pk, pairing);
     
     importKeyPair(&keypair_i, pk_i_Hex, pk_i_Hex_len, sk_i_Hex, sk_i_Hex_len);
