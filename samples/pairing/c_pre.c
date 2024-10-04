@@ -1333,8 +1333,8 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t *rk1_Hex, int *p_rk1_Hex_len,
     uint8_t *rk2_Hex, int *p_rk2_Hex_len)
 {
-    size_t sk1_len = element_length_in_bytes(p_reKeyPair->sk1);
-    size_t sk2_len = element_length_in_bytes(p_reKeyPair->sk2);
+    size_t sk1_len = element_length_in_bytes(p_reKeyPair->rk1);
+    size_t sk2_len = element_length_in_bytes(p_reKeyPair->rk2);
     if (sk1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
         sk2_len != G1_ELEMENT_LENGTH_IN_BYTES)
     {
@@ -1347,8 +1347,8 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t sk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
     uint8_t sk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 
-    sk1_len = element_to_bytes(sk1_bytes, p_reKeyPair->sk1);
-    sk2_len = element_to_bytes(sk2_bytes, p_reKeyPair->sk2);
+    sk1_len = element_to_bytes(sk1_bytes, p_reKeyPair->rk1);
+    sk2_len = element_to_bytes(sk2_bytes, p_reKeyPair->rk2);
 
     ByteStrToHexStr(sk1_bytes, sk1_len, rk1_Hex);
     ByteStrToHexStr(sk2_bytes, sk2_len, rk2_Hex);
