@@ -1572,7 +1572,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(R);
     element_clear(ciphertext.c1);
     element_clear(ciphertext.c2);
-    free(ciphertext.c3)
+    free(ciphertext.c3);
     element_clear(ciphertext.c4);
     element_clear(keypair.pk);
     free(m);
@@ -1646,9 +1646,9 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     element_pairing(eresult, ciphertext.c1, ciphertext.c4);
     element_pow_zn(eresult, eresult, keypair.sk);
     element_mul(R, ciphertext.c2, eresult);
-    char *hash3result = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
-    char *m = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     xor_bitstrings(m, ciphertext.c3, hash3result);
 
     //verify g^H1(m, R) == C1
@@ -1668,7 +1668,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         element_clear(R);
         element_clear(ciphertext.c1);
         element_clear(ciphertext.c2);
-        free(ciphertext.c3)
+        free(ciphertext.c3);
         element_clear(ciphertext.c4);
         element_clear(keypair.pk);
         element_clear(keypair.sk);
@@ -1835,6 +1835,8 @@ void ReEncTest()
     uint8_t rk2_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     int rk1_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
     int rk2_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
+
+    uint8_t *w=(uint8_t *)"hello world";
     ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
             w, rk1_Hex, &rk1_Hex_len, rk2_Hex, &rk2_Hex_len);
 }
