@@ -1676,6 +1676,9 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         element_clear(g);
         pairing_clear(pairing);	
     }
+    printf("Dec1 verify g^H1(m, R) == c1 success\n");
+    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes);
+    printf("m_bytes = %s\n", m_bytes);
 
     element_clear(c1_2);
     element_clear(hash1result);
@@ -1810,7 +1813,7 @@ void Enc1Test()
         c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
         m_bytes, sizeof(m_bytes));
-    printf("Enc2Test: m_bytes = %s\n", m_bytes);
+    printf("Enc1Test: m_bytes = %s\n", m_bytes);
 }
 
 
@@ -1844,14 +1847,14 @@ void ReEncTest()
 int main() {
 
     printf("=============\n");
-    printf("=======Enc1Test======\n");
-    printf("=============\n");
-    Enc1Test();
-
-    printf("=============\n");
     printf("=======Enc2Test======\n");
     printf("=============\n");
     Enc2Test();
+
+    printf("=============\n");
+    printf("=======Enc1Test======\n");
+    printf("=============\n");
+    Enc1Test();
 
     printf("=============\n");
     printf("=======ReEncTest=====\n");
