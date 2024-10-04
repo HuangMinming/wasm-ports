@@ -843,7 +843,7 @@ int exportCipherText(CipherText *p_ciphertext,
     uint8_t *c1_Hex, 
     uint8_t *c2_Hex, 
     uint8_t *c3_Hex, 
-    uint8_t *c4_Hex, )
+    uint8_t *c4_Hex)
 {
     printf("********************************\n");
     printf("**********importCipherText start************\n");
@@ -896,7 +896,7 @@ int exportCipherText(CipherText *p_ciphertext,
     //c1, c2, c3, c4 convert to Hex
     ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex);
     ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
-    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
+    ByteStrToHexStr(p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
     ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
 }
 
