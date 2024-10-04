@@ -1514,8 +1514,8 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     uint8_t *c2_i_Hex, int c2_i_Hex_len,
     uint8_t *c3_i_Hex, int c3_i_Hex_len,
     uint8_t *c4_i_Hex, int c4_i_Hex_len,
-    uint8_t *rk1_Hex, int *p_rk1_Hex_len,
-    uint8_t *rk2_Hex, int *p_rk2_Hex_len
+    uint8_t *rk1_Hex, int rk1_Hex_len,
+    uint8_t *rk2_Hex, int rk2_Hex_len,
     uint8_t *c1_j_Hex, uint8_t *c2_j_Hex,
     uint8_t *c3_j_Hex, uint8_t *c4_j_Hex
     )
