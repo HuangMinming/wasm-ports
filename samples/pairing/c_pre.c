@@ -847,7 +847,7 @@ int exportCipherText(CipherText *p_ciphertext,
     uint8_t *c4_Hex)
 {
     printf("********************************\n");
-    printf("**********importCipherText start************\n");
+    printf("**********exportCipherText start************\n");
     printf("********************************\n");
 
     int c1_len = element_length_in_bytes(p_ciphertext->c1);
@@ -899,6 +899,10 @@ int exportCipherText(CipherText *p_ciphertext,
     ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
     ByteStrToHexStr(p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
     ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
+
+    printf("********************************\n");
+    printf("**********exportCipherText end************\n");
+    printf("********************************\n");
 
     return 0;
 }
@@ -1443,6 +1447,9 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     uint8_t *rk1_Hex, int *p_rk1_Hex_len,
     uint8_t *rk2_Hex, int *p_rk2_Hex_len)
 {
+    printf("********************************\n");
+    printf("**********ReKeyGen start************\n");
+    printf("********************************\n");
     int iRet = -1;
 
     pairing_t pairing;
@@ -1496,6 +1503,99 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_clear(g);
     pairing_clear(pairing);	
 
+    printf("********************************\n");
+    printf("**********ReKeyGen end************\n");
+    printf("********************************\n");
+
+    return 0;
+}
+
+int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
+    uint8_t *c2_i_Hex, int c2_i_Hex_len,
+    uint8_t *c3_i_Hex, int c3_i_Hex_len,
+    uint8_t *c4_i_Hex, int c4_i_Hex_len,
+    uint8_t *rk1_Hex, int *p_rk1_Hex_len,
+    uint8_t *rk2_Hex, int *p_rk2_Hex_len
+    uint8_t *c1_j_Hex, uint8_t *c2_j_Hex,
+    uint8_t *c3_j_Hex, uint8_t *c4_j_Hex
+    )
+{
+    printf("********************************\n");
+    printf("**********ReEnc start************\n");
+    printf("********************************\n");
+    int iRet = -1;
+
+    pairing_t pairing;
+    element_t g;
+    element_t Z;
+    iRet = Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
+
+    //import ciphertext
+    CipherText CT_i;
+    element_init_G1(CT_i.c1, pairing);
+    element_init_GT(CT_i.c2, pairing);
+    element_init_G1(CT_i.c4, pairing);
+    // 为 ciphertext.c3 分配内存
+    CT_i.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    iRet = importCipherText(&CT_i, c1_i_Hex, c1_i_Hex_len,
+        c2_i_Hex, c2_i_Hex_len, c3_i_Hex, c3_i_Hex_len, 
+        c4_i_Hex, c4_i_Hex_len);
+    
+    //import reKeyPair
+    ReKeyPair rk_ij;
+    element_init_G1(rk_ij.rk1, pairing);
+    element_init_G1(rk_ij.rk2, pairing);
+    iRet = importReKeyPair(&rk_ij, rk1_Hex, rk1_Hex_len,
+        rk2_Hex, rk2_Hex_len);
+    
+    //initiate CT_j
+    CipherText CT_j;
+    element_init_G1(CT_j.c1, pairing);
+    element_init_GT(CT_j.c2, pairing);
+    element_init_G1(CT_j.c4, pairing);
+    // 为 ciphertext.c3 分配内存
+    CT_j.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+
+    
+    iRet = checkEqual4(pairing, g, &CT_i);
+    if(iRet != 0) 
+    {
+        printf("checkEqual4 return %d, exit", iRet);
+        return -1;
+    }
+
+    // 双线性对匹配，继续重加密
+    // C̄1 = C1
+    element_set(CT_j.c1, CT_i.c1);
+
+    // C̄2 = C2 · e(C1, rk1)
+    element_t pairing3;
+    element_init_GT(pairing3, pairing);
+    element_pairing(pairing3, CT_i.c1, rk_ij.rk1);
+    element_mul(CT_j.c2, CT_i.c2, pairing3);
+
+    // C̄3 = C3 (复制第三部分)
+    strcpy(CT_j.c3, CT_i.c3);
+
+    // C̄4 = rk2
+    element_set(CT_j.c4, rk_ij.rk2);
+
+
+    iRet = exportCipherText(&CT_j, c1_j_Hex, c2_j_Hex, c3_j_Hex, c4_j_Hex);
+    if(iRet != 0) 
+    {
+        printf("checkEqual4 return %d, exit", iRet);
+        return -1;
+    }
+
+    printf("********************************\n");
+    printf("**********ReEnc end************\n");
+    printf("********************************\n");
     return 0;
 }
 
@@ -1827,6 +1927,15 @@ void ReEncTest()
     int sk_i_Hex_len = ZR_ELEMENT_LENGTH_IN_BYTES * 2;
     KeyGen(pk_i_Hex, &pk_i_Hex_len, sk_i_Hex, &sk_i_Hex_len);
 
+    uint8_t *m=(uint8_t *)"abcdefghij1234567890123456789012";
+    uint8_t *w=(uint8_t *)"hello world";
+    uint8_t c1_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_i_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    Enc2(pk_i_Hex, pk_i_Hex_len, m, w, 
+        c1_i_Hex,c2_i_Hex,c3_i_Hex,c4_i_Hex);
+
     uint8_t pk_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t sk_j_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
     int pk_j_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
@@ -1839,9 +1948,29 @@ void ReEncTest()
     int rk1_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
     int rk2_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
 
-    uint8_t *w=(uint8_t *)"hello world";
     ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
             w, rk1_Hex, &rk1_Hex_len, rk2_Hex, &rk2_Hex_len);
+
+    uint8_t c1_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_j_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_j_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+
+    ReEnc(c1_i_Hex, sizeof(c1_i_Hex), 
+        c2_i_Hex, sizeof(c2_i_Hex),
+        c3_i_Hex, sizeof(c3_i_Hex),
+        c4_i_Hex, sizeof(c4_i_Hex),
+        rk1_Hex, sizeof(rk1_Hex),
+        rk2_Hex, sizeof(rk2_Hex),
+        c1_j_Hex, c2_j_Hex, c3_j_Hex, c4_j_Hex);
+    
+    uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
+    Dec1(pk_j_Hex, sizeof(pk_j_Hex), sk_j_Hex, sizeof(sk_j_Hex),
+        c1_j_Hex, sizeof(c1_j_Hex), c2_j_Hex, sizeof(c2_j_Hex),
+        c3_j_Hex, sizeof(c3_j_Hex), c4_j_Hex, sizeof(c4_j_Hex),
+        m_bytes, sizeof(m_bytes));
+    printf("Enc1Test: m_bytes = %s\n", m_bytes);
+
 }
 
 int main() {
@@ -1859,7 +1988,7 @@ int main() {
     printf("=============\n");
     printf("=======ReEncTest=====\n");
     printf("=============\n");
-    // ReEncTest();
+    ReEncTest();
     
 
 
