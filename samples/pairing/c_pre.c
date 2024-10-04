@@ -839,6 +839,67 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
     return 0;
 }
 
+int exportCipherText(CipherText *p_ciphertext, 
+    uint8_t *c1_Hex, 
+    uint8_t *c2_Hex, 
+    uint8_t *c3_Hex, 
+    uint8_t *c4_Hex, )
+{
+    printf("********************************\n");
+    printf("**********importCipherText start************\n");
+    printf("********************************\n");
+
+    int c1_len = element_length_in_bytes(p_ciphertext->c1);
+    int c2_len = element_length_in_bytes(p_ciphertext->c2);
+    int c4_len = element_length_in_bytes(p_ciphertext->c4);
+    if (c1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
+        c2_len != GT_ELEMENT_LENGTH_IN_BYTES ||
+        c4_len != G1_ELEMENT_LENGTH_IN_BYTES)
+    {
+        printf("c1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c1_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("c2_len = %d, GT_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c2_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("c4_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            c4_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("exit \n");
+        return -1;
+    }
+    uint8_t c1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+
+    element_to_bytes(c1_bytes, p_ciphertext->c1);
+    element_to_bytes(c2_bytes, p_ciphertext->c2);
+    element_to_bytes(c4_bytes, p_ciphertext->c4);
+    printf("c1:\n");
+    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c1_bytes[i]);
+    }
+    printf("\n");
+    printf("c2:\n");
+    for(int i=0;i<GT_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c2_bytes[i]);
+    }
+    printf("\n");
+    printf("c3:\n");
+    for(int i=0;i<SHA256_DIGEST_LENGTH_32 * 8;i++) {
+        printf("%02x ", p_ciphertext->c3[i]);
+    }
+    printf("\n");
+    printf("c4:\n");
+    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+        printf("%02x ", c4_bytes[i]);
+    }
+    printf("\n");
+
+    //c1, c2, c3, c4 convert to Hex
+    ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex);
+    ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
+    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
+    ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
+}
+
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
 //输出c1,c2,c3,c4，其中c1, c2, c4转为bytes后再转为Hex,c3直接转为Hex，所有长度都是固定的，无需输出
@@ -940,20 +1001,11 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(ciphertext.c4, hash4result, r);
 
     //c1, c2, c4 conver to bytes
-    int c1_len = element_length_in_bytes(ciphertext.c1);
-    int c2_len = element_length_in_bytes(ciphertext.c2);
-    int c4_len = element_length_in_bytes(ciphertext.c4);
-    if (c1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
-        c2_len != GT_ELEMENT_LENGTH_IN_BYTES ||
-        c4_len != G1_ELEMENT_LENGTH_IN_BYTES)
+    iRet = exportCipherText(&ciphertext, c1_Hex, c2_Hex, c3_Hex, c4_Hex);
+    if(iRet != 0) 
     {
-        printf("c1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
-            c1_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("c2_len = %d, GT_ELEMENT_LENGTH_IN_BYTES = %d\n", 
-            c2_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("c4_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
-            c4_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("exit \n");
+        printf("exportCipherText return = %d\n", iRet);
+        printf("exit\n");
         free(m);
         element_clear(R);
         element_clear(r);
@@ -971,42 +1023,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
         pairing_clear(pairing);
         return -1;
     }
-    uint8_t c1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
-    uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-
-    element_to_bytes(c1_bytes, ciphertext.c1);
-    element_to_bytes(c2_bytes, ciphertext.c2);
-    element_to_bytes(c4_bytes, ciphertext.c4);
-    printf("c1:\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", c1_bytes[i]);
-    }
-    printf("\n");
-    printf("c2:\n");
-    for(int i=0;i<GT_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", c2_bytes[i]);
-    }
-    printf("\n");
-    printf("c3:\n");
-    for(int i=0;i<SHA256_DIGEST_LENGTH_32 * 8;i++) {
-        printf("%02x ", ciphertext.c3[i]);
-    }
-    printf("\n");
-    printf("c4:\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-        printf("%02x ", c4_bytes[i]);
-    }
-    printf("\n");
-
-    //c1, c2, c3, c4 convert to Hex
-    ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex);
-    ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
-    ByteStrToHexStr(ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
-    ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
-
-
-
+    
     free(m);
     element_clear(R);
     element_clear(r);
@@ -1333,6 +1350,9 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t *rk1_Hex, int *p_rk1_Hex_len,
     uint8_t *rk2_Hex, int *p_rk2_Hex_len)
 {
+    printf("********************************\n");
+    printf("**********exportReKeyPair start************\n");
+    printf("********************************\n");
     size_t sk1_len = element_length_in_bytes(p_reKeyPair->rk1);
     size_t sk2_len = element_length_in_bytes(p_reKeyPair->rk2);
     if (sk1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
@@ -1375,6 +1395,63 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
         printf("%c", rk2_Hex[i]);
     }
     printf("\n");
+    printf("********************************\n");
+    printf("**********exportReKeyPair end************\n");
+    printf("********************************\n");
+    return 0;
+}
+
+int importReKeyPair(ReKeyPair *p_reKeyPair, 
+    uint8_t *rk1_Hex, int rk1_Hex_len,
+    uint8_t *rk2_Hex, int rk2_Hex_len)
+{
+    printf("********************************\n");
+    printf("**********importReKeyPair start************\n");
+    printf("********************************\n");
+    if(rk1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       rk2_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2)  )
+    {
+        printf("rk1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
+            rk1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("rk2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
+            rk2_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        return -1;
+    }
+
+    //import rk1
+    uint8_t rk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    printf("before HexStrToByteStr, rk1_Hex=\n");
+    for(int i=0;i<rk1_Hex_len;i++) {
+        printf("%c", (unsigned int)rk1_Hex[i]);
+    }
+    printf("\n");
+    HexStrToByteStr((uint8_t *)rk1_Hex, rk1_Hex_len, rk1_bytes);
+    printf("after HexStrToByteStr, c1_bytes=\n");
+    for(int i=0;i<rk1_Hex_len/2;i++) {
+        printf("%02x ", rk1_bytes[i]);
+    }
+    printf("\n");
+
+    //p_reKeyPair需要在调用importReKeyPair前完成初始化，这样就不用传递pairing
+    int rk1_len = element_from_bytes(p_reKeyPair->rk1, (uint8_t *)rk1_bytes);
+
+    //import rk2
+    uint8_t rk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    printf("before HexStrToByteStr, rk2_Hex=\n");
+    for(int i=0;i<rk2_Hex_len;i++) {
+        printf("%c", (unsigned int)rk2_Hex[i]);
+    }
+    printf("\n");
+    HexStrToByteStr((uint8_t *)rk2_Hex, rk2_Hex_len, rk2_bytes);
+    printf("after HexStrToByteStr, rk2_bytes=\n");
+    for(int i=0;i<rk2_Hex_len/2;i++) {
+        printf("%02x ", rk2_bytes[i]);
+    }
+    printf("\n");
+
+    //p_reKeyPair需要在调用importReKeyPair前完成初始化，这样就不用传递pairing
+    int rk2_len = element_from_bytes(p_reKeyPair->rk2, (uint8_t *)rk2_bytes);
+
     return 0;
 }
 
@@ -1402,7 +1479,6 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_init_Zr(keypair_i.sk, pairing);
     element_init_G1(keypair_i.pk, pairing);
     element_init_G1(keypair_j.pk, pairing);
-    
     importKeyPair(&keypair_i, pk_i_Hex, pk_i_Hex_len, sk_i_Hex, sk_i_Hex_len);
     importKeyPair(&keypair_j, pk_j_Hex, pk_j_Hex_len, NULL, 0);
 
@@ -1424,20 +1500,17 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
 
     //convert rk_ij to Hex
     exportReKeyPair(&rk_ij, rk1_Hex, p_rk1_Hex_len, rk2_Hex, p_rk2_Hex_len);
-    printf("exportReKeyPair ok0");
+
 
     element_clear(negski);
     element_clear(s);
     element_clear(powresult);
     element_clear(hash2result);
-    printf("exportReKeyPair ok1");
     element_clear(rk_ij.rk1);
     element_clear(rk_ij.rk2);
-    printf("exportReKeyPair ok2");
     element_clear(keypair_i.pk);
     element_clear(keypair_i.sk);
     element_clear(keypair_j.pk);
-    printf("exportReKeyPair ok3");
     element_clear(Z);
     element_clear(g);
     pairing_clear(pairing);	
