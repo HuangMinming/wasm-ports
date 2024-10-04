@@ -1684,7 +1684,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(R);
     element_clear(ciphertext.c1);
     element_clear(ciphertext.c2);
-    free(ciphertext.c3)
+    free(ciphertext.c3);
     element_clear(ciphertext.c4);
     element_clear(keypair.pk);
     element_clear(keypair.sk);
