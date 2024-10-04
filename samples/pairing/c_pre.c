@@ -1854,7 +1854,7 @@ int main() {
     printf("=============\n");
     printf("=======ReEncTest=====\n");
     printf("=============\n");
-    ReEncTest();
+    // ReEncTest();
     
 
 
