@@ -1776,7 +1776,7 @@ void Enc1Test()
     }
     printf("\n");
 
-    uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
+    uint8_t *m=(uint8_t *)"abcdefghijklmnopqrstuvwxyz123456";
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
