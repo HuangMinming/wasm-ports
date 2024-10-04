@@ -1651,6 +1651,34 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     char *m = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     xor_bitstrings(m, ciphertext.c3, hash3result);
 
+    //verify g^H1(m, R) == C1
+    element_t hash1result;
+    element_init_Zr(hash1result, pairing);
+    Hash1(hash1result, m, R); 
+    element_t c1_2;
+    element_init_G1(c1_2, pairing);
+    element_pow_zn(c1_2, g, hash1result);
+    if (element_cmp(c1_2, ciphertext.c1) != 0)
+    {
+        printf("Dec1 verify g^H1(m, R) == c1 fail\n");
+        element_clear(c1_2);
+        element_clear(hash1result);
+        free(hash3result);
+        element_clear(eresult);
+        element_clear(R);
+        element_clear(ciphertext.c1);
+        element_clear(ciphertext.c2);
+        free(ciphertext.c3)
+        element_clear(ciphertext.c4);
+        element_clear(keypair.pk);
+        element_clear(keypair.sk);
+        element_clear(Z);
+        element_clear(g);
+        pairing_clear(pairing);	
+    }
+
+    element_clear(c1_2);
+    element_clear(hash1result);
     free(hash3result);
     element_clear(eresult);
     element_clear(R);
