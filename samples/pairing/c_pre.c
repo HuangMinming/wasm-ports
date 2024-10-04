@@ -108,7 +108,8 @@ void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
     bitstring[bit_index] = '\0';  // 结束符
 }
 
-//这里要求str1和str2的长度必须一致，否则会越界，这里都是256
+//这里要求str1和str2的长度必须一致，否则会越界，这里都是256，
+//输出的result是以\0结束的字符串
 void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
     int n = strlen((const char *)str1);
     for (int i = 0; i < n; i++) {
@@ -232,7 +233,7 @@ void Hash2(element_t result, element_t pk,  uint8_t * w) {
 }
 
 
-// Hash3 G1 -> {0,1}^n
+// Hash3 G1 -> {0,1}^n,输出的bitstring是以\0结束的字符串
 void Hash3(uint8_t *bitstring, element_t R){
     // 获取 G1 群元素 R 的字节表示
     int R_len = element_length_in_bytes(R);
@@ -898,6 +899,8 @@ int exportCipherText(CipherText *p_ciphertext,
     ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex);
     ByteStrToHexStr(p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex);
     ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex);
+
+    return 0;
 }
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
@@ -912,12 +915,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     printf("********************************\n");
     printf("**********Enc2 start************\n");
     printf("********************************\n");
-    if(pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) )
-    {
-        printf("error pk_Hex_len = %d\n", pk_Hex_len);
-        printf("pk_Hex_len should equal to  %d\n", G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        return -1;
-    }
+
     int iRet = -1;
 
     //先把m_bytes转成bit
@@ -941,12 +939,12 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_G1(keypair.pk, pairing);
     importKeyPair(&keypair, pk_Hex, pk_Hex_len, NULL, 0);
 
-    printf("ok1\n");
+
     CipherText ciphertext;
     element_init_G1(ciphertext.c1, pairing);
     element_init_GT(ciphertext.c2, pairing);
     element_init_G1(ciphertext.c4, pairing);
-    printf("ok2\n");
+
     // 为 ciphertext.c3 分配内存
     ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     element_t R, r, hash2result, eresult, hash4result;
@@ -957,14 +955,14 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     
     //m是以\0结束的字符串
     Hash1(r, m, R); 
-    printf("ok3\n");
+
     //get c1
     element_pow_zn(ciphertext.c1, g, r);
 
     //hash2result在调用Hash2前需要完成初始化，w是以\0结束的字符串
     element_init_G1(hash2result, pairing);
     Hash2(hash2result, keypair.pk, w);
-    printf("ok4\n");
+
     uint8_t hash2result_bytes[8196];
     int len = element_to_bytes(hash2result_bytes, hash2result); 
     printf("hash2result_bytes:\n");
@@ -986,7 +984,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
 
     printf("hash3result: %s\n",hash3result);
 
-    printf("ok5\n");
+
     //get c3, c3以\0结束
     xor_bitstrings(ciphertext.c3, m, hash3result);
     printf("length(ciphertext.c3) = %d, ciphertext.c3 = %s\n", 
@@ -1198,29 +1196,12 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     printf("********************************\n");
     printf("**********Dec2 start************\n");
     printf("********************************\n");
-    if(sk_Hex_len != (ZR_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       m_bytes_len != (SHA256_DIGEST_LENGTH_32 + 1) || 
-       c1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       c2_Hex_len != (GT_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       c3_Hex_len != (SHA256_DIGEST_LENGTH_32 * 8 * 2) ||
-       c4_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2)
+    if(
+       m_bytes_len != (SHA256_DIGEST_LENGTH_32 + 1) 
        )
     {
-        printf("sk_Hex_len = %d, sk_Hex_len should equal to  %d\n", 
-            sk_Hex_len, ZR_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("pk_Hex_len = %d, pk_Hex_len should equal to  %d\n", 
-            pk_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
         printf("m_bytes_len = %d, m_bytes_len should equal to  %d\n", 
             m_bytes_len, (SHA256_DIGEST_LENGTH_32 + 1));
-        printf("c1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
-            c1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("c2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
-            c2_Hex_len, GT_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("c3_Hex_len = %d, c3_Hex_len should equal to  %d\n", 
-            c3_Hex_len, SHA256_DIGEST_LENGTH_32 * 8 * 2);
-        printf("c4_Hex_len = %d, c4_Hex_len should equal to  %d\n", 
-            c4_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);  
         return -1;
     }
     int iRet = -1;
@@ -1518,10 +1499,179 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     return 0;
 }
 
+//m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
+//m是AES-GCM key，长度是256bit，32字节
+int Enc1(uint8_t *pk_Hex, int pk_Hex_len, 
+    uint8_t *m_bytes,
+    uint8_t *c1_Hex, uint8_t *c2_Hex, uint8_t *c3_Hex, uint8_t *c4_Hex
+    )
+{
+    printf("********************************\n");
+    printf("**********Enc1 start************\n");
+    printf("********************************\n");
+
+    int iRet = -1;
+
+    //先把m_bytes转成bit
+    int m_len = strlen((const char *)m_bytes) * 8 + 1;
+    uint8_t *m = (uint8_t *)malloc(m_len);
+    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
+    printf("m=%s\n", m);
+
+    pairing_t pairing;
+    element_t g;
+    element_t Z;
+    KeyPair keypair;
+    iRet = Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
+
+    //import pk
+    element_init_G1(keypair.pk, pairing);
+    importKeyPair(&keypair, pk_Hex, pk_Hex_len, NULL, 0);
+
+    CipherText ciphertext;
+    element_init_G1(ciphertext.c1, pairing);
+    element_init_GT(ciphertext.c2, pairing);
+    element_init_G1(ciphertext.c4, pairing);
+
+    // 为 ciphertext.c3 分配内存
+    ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+
+    element_t R, r, s0, eresult, emuls;
+    element_init_GT(R, pairing);
+    element_random(R);
+    element_init_Zr(s0, pairing);
+    element_random(s0);
+    element_init_Zr(r, pairing);
+    element_init_GT(eresult, pairing);
+    element_init_Zr(emuls, pairing);
+    Hash1(r, m, R); 
+    element_pow_zn(ciphertext.c1, g, r);
+    element_mul(emuls, s0, r);
+    element_neg(emuls, emuls);
+    element_pairing(eresult, g, keypair.pk);
+    element_pow_zn(eresult, eresult, emuls);
+    element_mul(ciphertext.c2, R, eresult);
+    uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    Hash3(hash3result, R);
+    xor_bitstrings(ciphertext.c3, m, hash3result);
+    element_pow_zn(ciphertext.c4, g, s0);
+
+    //export ciphertext
+    exportCipherText(&ciphertext, c1_Hex, c2_Hex, c3_Hex, c4_Hex);
+
+    free(hash3result);
+    element_clear(emuls);
+    element_clear(eresult);
+    element_clear(s0);
+    element_clear(r);
+    element_clear(R);
+    element_clear(ciphertext.c1);
+    element_clear(ciphertext.c2);
+    free(ciphertext.c3)
+    element_clear(ciphertext.c4);
+    element_clear(keypair.pk);
+    free(m);
+    element_clear(Z);
+    element_clear(g);
+    pairing_clear(pairing);	
 
 
-int main() {
+    printf("********************************\n");
+    printf("**********Enc1 end************\n");
+    printf("********************************\n");
+    return 0;
+}
 
+/*
+m_bytes_len = SHA256_DIGEST_LENGTH_32 + 1;
+*/
+int Dec1(uint8_t *pk_Hex, int pk_Hex_len, 
+    uint8_t *sk_Hex, int sk_Hex_len, 
+    uint8_t *c1_Hex, int c1_Hex_len,
+    uint8_t *c2_Hex, int c2_Hex_len,
+    uint8_t *c3_Hex, int c3_Hex_len,
+    uint8_t *c4_Hex, int c4_Hex_len,
+    uint8_t *m_bytes, int m_bytes_len
+    )
+{
+    printf("********************************\n");
+    printf("**********Dec1 start************\n");
+    printf("********************************\n");
+    if(
+       m_bytes_len != (SHA256_DIGEST_LENGTH_32 + 1) 
+       )
+    {
+        printf("m_bytes_len = %d, m_bytes_len should equal to  %d\n", 
+            m_bytes_len, (SHA256_DIGEST_LENGTH_32 + 1));
+        return -1;
+    }
+    int iRet = -1;
+
+    pairing_t pairing;
+    element_t g;
+    element_t Z;
+    KeyPair keypair;
+    iRet = Setup(pairing, g, Z);
+    if(iRet != 0) 
+    {
+        printf("Setup return %d, exit", iRet);
+        return -1;
+    }
+
+    //import ciphertext
+    CipherText ciphertext;
+    element_init_G1(ciphertext.c1, pairing);
+    element_init_GT(ciphertext.c2, pairing);
+    element_init_G1(ciphertext.c4, pairing);
+    // 为 ciphertext.c3 分配内存
+    ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    iRet = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
+        c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
+        c4_Hex, c4_Hex_len);
+    
+    //import keypair
+    element_init_G1(keypair.pk, pairing);
+    element_init_Zr(keypair.sk, pairing);
+    importKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
+
+    element_t R, eresult;
+    element_init_GT(R, pairing);
+    element_init_GT(eresult, pairing);
+
+    element_pairing(eresult, ciphertext.c1, ciphertext.c4);
+    element_pow_zn(eresult, eresult, keypair.sk);
+    element_mul(R, ciphertext.c2, eresult);
+    char *hash3result = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    Hash3(hash3result, R);
+    char *m = (char *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    xor_bitstrings(m, ciphertext.c3, hash3result);
+
+    free(hash3result);
+    element_clear(eresult);
+    element_clear(R);
+    element_clear(ciphertext.c1);
+    element_clear(ciphertext.c2);
+    free(ciphertext.c3)
+    element_clear(ciphertext.c4);
+    element_clear(keypair.pk);
+    element_clear(keypair.sk);
+    element_clear(Z);
+    element_clear(g);
+    pairing_clear(pairing);	
+
+    printf("********************************\n");
+    printf("**********Dec1 end************\n");
+    printf("********************************\n");
+    return 0;
+}
+
+void Enc2Test()
+{
     uint8_t pk_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
     int pk_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
@@ -1575,9 +1725,70 @@ int main() {
         w, c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
         m_bytes, sizeof(m_bytes));
-    printf("main: m_bytes = %s\n", m_bytes);
+    printf("Enc2Test: m_bytes = %s\n", m_bytes);
+}
+
+void Enc1Test()
+{
+    uint8_t pk_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t sk_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
+    int pk_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
+    int sk_Hex_len = ZR_ELEMENT_LENGTH_IN_BYTES * 2;
+
+    KeyGen(pk_Hex, &pk_Hex_len, sk_Hex, &sk_Hex_len);
+
+    printf("pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
+    for(int i=0;i<pk_Hex_len;i++) {
+        printf("%c", pk_Hex[i]);
+    }
+    printf("\n");
+    printf("sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
+    for(int i=0;i<sk_Hex_len;i++) {
+        printf("%c", sk_Hex[i]);
+    }
+    printf("\n");
+
+    uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
+    uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    Enc1(pk_Hex, pk_Hex_len, m, c1_Hex,c2_Hex,c3_Hex,c4_Hex);
+
+    printf("c1:\n");
+    for(int i=0;i<sizeof(c1_Hex);i++) {
+        printf("%c", c1_Hex[i]);
+    }
+    printf("\n");
+    printf("c2:\n");
+    for(int i=0;i<sizeof(c2_Hex);i++) {
+        printf("%c", c2_Hex[i]);
+    }
+    printf("\n");
+    printf("c3:\n");
+    for(int i=0;i<sizeof(c3_Hex);i++) {
+        printf("%c", c3_Hex[i]);
+    }
+    printf("\n");
+    printf("c4:\n");
+    for(int i=0;i<sizeof(c4_Hex);i++) {
+        printf("%c", c4_Hex[i]);
+    }
+    printf("\n");
 
 
+    uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
+    Dec1(pk_Hex, sizeof(pk_Hex), sk_Hex, sizeof(sk_Hex),
+        c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
+        c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
+        m_bytes, sizeof(m_bytes));
+    printf("Enc2Test: m_bytes = %s\n", m_bytes);
+}
+
+
+
+void ReEncTest() 
+{
     //start to test ReKeyGen
     uint8_t pk_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t sk_i_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
@@ -1598,6 +1809,25 @@ int main() {
     int rk2_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
     ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
             w, rk1_Hex, &rk1_Hex_len, rk2_Hex, &rk2_Hex_len);
+}
+
+int main() {
+
+    printf("=============\n");
+    printf("=======Enc1Test======\n");
+    printf("=============\n");
+    Enc1Test();
+
+    printf("=============\n");
+    printf("=======Enc2Test======\n");
+    printf("=============\n");
+    Enc2Test();
+
+    printf("=============\n");
+    printf("=======ReEncTest=====\n");
+    printf("=============\n");
+    ReEncTest();
+    
 
 
     return 0;
