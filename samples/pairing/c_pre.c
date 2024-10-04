@@ -1519,7 +1519,7 @@ int main() {
     uint8_t rk2_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     int rk1_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
     int rk2_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
-    int ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
+    ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
             w, rk1_Hex, &rk1_Hex_len, rk2_Hex, &rk2_Hex_len);
 
 
