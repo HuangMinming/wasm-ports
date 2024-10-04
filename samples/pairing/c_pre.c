@@ -1424,17 +1424,20 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
 
     //convert rk_ij to Hex
     exportReKeyPair(&rk_ij, rk1_Hex, p_rk1_Hex_len, rk2_Hex, p_rk2_Hex_len);
+    printf("exportReKeyPair ok0");
 
     element_clear(negski);
     element_clear(s);
     element_clear(powresult);
     element_clear(hash2result);
+    printf("exportReKeyPair ok1");
     element_clear(rk_ij.rk1);
     element_clear(rk_ij.rk2);
-    element_clear(keypair_i.pk);
+    printf("exportReKeyPair ok2");
     element_clear(keypair_i.pk);
     element_clear(keypair_i.sk);
     element_clear(keypair_j.pk);
+    printf("exportReKeyPair ok3");
     element_clear(Z);
     element_clear(g);
     pairing_clear(pairing);	
