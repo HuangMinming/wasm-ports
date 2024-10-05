@@ -99,7 +99,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len,
 uint8_t *bitstring: input, point to the source bit string
 int bit_len: input, indicate the source length, should greater than 0, should be devided by 8
 uint8_t *bytes: point the destination, 
-        before return ,we set bytes[bit_len/8 + 1] = '\0'
+        before return ,we set bytes[bit_len/8] = '\0'
 int byte_len:input, indicate the destination length, 
         should be greater or equal than bit_len / 8 + 1
 
@@ -108,7 +108,7 @@ int bits_to_bytes( uint8_t *bitstring, int bit_len,
         uint8_t *bytes, int byte_len) 
 {
     if(NULL == bitstring || NULL == bytes ||
-        bit_len < 0 || 
+        bit_len <= 0 || 
         (bit_len % 8 != 0) ||
         byte_len < (bit_len / 8 + 1)
     )
@@ -141,7 +141,7 @@ int bits_to_bytes( uint8_t *bitstring, int bit_len,
 uint8_t *bytes: input, point to the source bytes string
 int byte_len: input, indicate the source length, should greater than 0
 uint8_t *bitstring: point the destination, 
-        before return ,we set bitstring[byte_len * 8 + 1] = '\0'
+        before return ,we set bitstring[byte_len * 8] = '\0'
 int bit_len:input, indicate the destination length, 
         should be greater or equal than bit_len * 8 + 1
 
@@ -150,7 +150,7 @@ int bytes_to_bits( uint8_t *bytes, int byte_len,
     uint8_t *bitstring, int bit_len) 
 {
     if(NULL == bytes || NULL == bitstring ||
-        byte_len < 0 || 
+        byte_len <= 0 || 
         bit_len < (byte_len * 8 + 1)
     )
     {
@@ -171,9 +171,24 @@ int bytes_to_bits( uint8_t *bytes, int byte_len,
 
 //这里要求str1和str2的长度必须一致，否则会越界，这里都是256，
 //输出的result是以\0结束的字符串
-void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
-    int n = strlen((const char *)str1);
-    for (int i = 0; i < n; i++) {
+/*
+uint8_t *result: output, compute str1 xor str2, 
+    before return ,we set result[str1_len] = '\0'
+uint8_t *str1: input, is a string of '1' and '0'
+int str1_len: the length of str1
+uint8_t *str2: input, is a string of '1' and '0'
+int str2_le: the length of str2
+*/
+int xor_bitstrings(uint8_t *result, uint8_t *str1, int str1_len, 
+    uint8_t *str2, int str2_len) {
+    if(NULL == result || NULL == str1 || NULL == str2 ||
+    str1_len <= 0 || str1_len != str2_len)
+    {
+        printf("xor_bitstrings input error\n");
+        return -1;
+    }
+    // int n = strlen((const char *)str1);
+    for (int i = 0; i < str1_len; i++) {
         // 逐位进行异或 ('0' 异或 '0' 为 '0', '0' 异或 '1' 为 '1', '1' 异或 '1' 为 '0')
         if (str1[i] == str2[i]) {
             result[i] = '0';  // 相同为 '0'
@@ -181,7 +196,8 @@ void xor_bitstrings(uint8_t *result, uint8_t *str1, uint8_t *str2) {
             result[i] = '1';  // 不同为 '1'
         }
     }
-    result[n] = '\0';  // 确保字符串以 '\0' 结束
+    result[str1_len] = '\0';  // 确保字符串以 '\0' 结束
+    return 0;
 }
 
 int Setup(pairing_t pairing, element_t g, element_t Z)
@@ -1071,7 +1087,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
 
 
     //get c3, c3以\0结束
-    xor_bitstrings(ciphertext.c3, m, hash3result);
+    xor_bitstrings(ciphertext.c3, m, m_len - 1, hash3result, SHA256_DIGEST_LENGTH_32 * 8);
     printf("length(ciphertext.c3) = %d, ciphertext.c3 = %s\n", 
         strlen((const char *)ciphertext.c3), ciphertext.c3);
 
@@ -1359,7 +1375,8 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
 
 
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    xor_bitstrings(m, ciphertext.c3, hash3result);
+    xor_bitstrings(m, ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8,
+        hash3result, SHA256_DIGEST_LENGTH_32 * 8);
     printf("m=%s\n", m);
 
     //verify g^H1(m, R) == C1
@@ -1785,7 +1802,8 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_mul(ciphertext.c2, R, eresult);
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
-    xor_bitstrings(ciphertext.c3, m, hash3result);
+    xor_bitstrings(ciphertext.c3, m, SHA256_DIGEST_LENGTH_32 * 8,
+        hash3result, SHA256_DIGEST_LENGTH_32 * 8);
     element_pow_zn(ciphertext.c4, g, s0);
 
     //export ciphertext
@@ -1876,7 +1894,8 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     Hash3(hash3result, R);
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    xor_bitstrings(m, ciphertext.c3, hash3result);
+    xor_bitstrings(m, ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, 
+        hash3result, SHA256_DIGEST_LENGTH_32 * 8);
 
     //verify g^H1(m, R) == C1
     element_t hash1result;
