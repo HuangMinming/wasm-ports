@@ -18,13 +18,13 @@ int dest_len: input, should be greater or equal than src_len * 2
 uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len, 
     uint8_t * dest_buf, int dest_len)
 {
-    uint8_t highHex, lowHex;
-    if(NULL == src_buf || src_len <= 0 || dest_len < src_len * 2)
+    if(NULL == src_buf || NULL == dest_buf ||
+         src_len <= 0 || dest_len < src_len * 2)
 	{
-        printf("input error\n");
+        printf("ByteStrToHexStr input error\n");
         return -1;
     }	
-
+    uint8_t highHex, lowHex;
     const uint8_t * index = src_buf, * end = src_buf + src_len;
     uint8_t * ridx = dest_buf;
     
@@ -52,12 +52,24 @@ uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len,
 
 /*
  “233A464C52” ==>[0x23, 0x3A, 0x46, 0x4C, 0x52]
+const uint8_t * src_buf: input, point to the source
+int src_len: input, indicate the length, should greater than 0, should be devided by 2
+uint8_t * dest_buf: output, point to the destination
+int dest_len: input, should be greater or equal than src_len / 2
 */
-uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, uint8_t * dest_buf)
+uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, 
+    uint8_t * dest_buf, int dest_len)
 {
+    if(NULL == src_buf || NULL == dest_buf ||
+         src_len <= 0 || 
+         (src_len % 2 == 1)
+         (dest_len < src_len / 2)
+         )
+	{
+        printf("HexStrToByteStr input error\n");
+        return -1;
+    }	
     uint8_t highByte, lowByte;
-    if(NULL == src_buf)
-		return 1;
 	const uint8_t * index = src_buf, * end = src_buf + src_len;
     uint8_t * ridx = dest_buf;
     
@@ -819,7 +831,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
             printf("%c", (unsigned int)pk_Hex[i]);
         }
         printf("\n");
-        HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes);
+        HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes, sizeof(pk_bytes));
         printf("after HexStrToByteStr, pk_bytes=\n");
         for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
             printf("%02x ", pk_bytes[i]);
@@ -845,7 +857,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
             printf("%c", (unsigned int)sk_Hex[i]);
         }
         printf("\n");
-        HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes);
+        HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes, sizeof(sk_bytes));
         printf("after HexStrToByteStr, sk_bytes=\n");
         for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
             printf("%02x ", sk_bytes[i]);
@@ -1104,7 +1116,7 @@ int importCipherText(CipherText *p_ciphertext,
         printf("%c", (unsigned int)c1_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes);
+    HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes, sizeof(c1_bytes));
     printf("after HexStrToByteStr, c1_bytes=\n");
     for(int i=0;i<c1_Hex_len/2;i++) {
         printf("%02x ", c1_bytes[i]);
@@ -1122,7 +1134,7 @@ int importCipherText(CipherText *p_ciphertext,
         printf("%c", (unsigned int)c2_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes);
+    HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes, sizeof(c2_bytes));
     printf("after HexStrToByteStr, c2_bytes=\n");
     for(int i=0;i<c2_Hex_len/2;i++) {
         printf("%02x ", c2_bytes[i]);
@@ -1140,7 +1152,7 @@ int importCipherText(CipherText *p_ciphertext,
         printf("%c", (unsigned int)c3_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes);
+    HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes, sizeof(c3_bytes));
     printf("after HexStrToByteStr, c3_bytes=\n");
     for(int i=0;i<c3_Hex_len/2;i++) {
         printf("%02x ", c3_bytes[i]);
@@ -1160,7 +1172,7 @@ int importCipherText(CipherText *p_ciphertext,
         printf("%c", (unsigned int)c4_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes);
+    HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes, sizeof(c4_bytes));
     printf("after HexStrToByteStr, c4_bytes=\n");
     for(int i=0;i<c4_Hex_len/2;i++) {
         printf("%02x ", c4_bytes[i]);
@@ -1439,7 +1451,7 @@ int importReKeyPair(ReKeyPair *p_reKeyPair,
         printf("%c", (unsigned int)rk1_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)rk1_Hex, rk1_Hex_len, rk1_bytes);
+    HexStrToByteStr((uint8_t *)rk1_Hex, rk1_Hex_len, rk1_bytes, sizeof(rk1_bytes));
     printf("after HexStrToByteStr, c1_bytes=\n");
     for(int i=0;i<rk1_Hex_len/2;i++) {
         printf("%02x ", rk1_bytes[i]);
@@ -1456,7 +1468,7 @@ int importReKeyPair(ReKeyPair *p_reKeyPair,
         printf("%c", (unsigned int)rk2_Hex[i]);
     }
     printf("\n");
-    HexStrToByteStr((uint8_t *)rk2_Hex, rk2_Hex_len, rk2_bytes);
+    HexStrToByteStr((uint8_t *)rk2_Hex, rk2_Hex_len, rk2_bytes, sizeof(rk2_bytes));
     printf("after HexStrToByteStr, rk2_bytes=\n");
     for(int i=0;i<rk2_Hex_len/2;i++) {
         printf("%02x ", rk2_bytes[i]);
