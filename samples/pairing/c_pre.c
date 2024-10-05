@@ -175,14 +175,14 @@ int bytes_to_bits( uint8_t *bytes, int byte_len,
 uint8_t *result: output, compute str1 xor str2, 
     before return ,we set result[str1_len] = '\0'
 uint8_t *str1: input, is a string of '1' and '0'
-int str1_len: the length of str1
+int str1_len: the length of str1， not include the '\0'
 uint8_t *str2: input, is a string of '1' and '0'
-int str2_le: the length of str2
+int str2_le: the length of str2，not include the '\0'
 */
 int xor_bitstrings(uint8_t *result, uint8_t *str1, int str1_len, 
     uint8_t *str2, int str2_len) {
     if(NULL == result || NULL == str1 || NULL == str2 ||
-    str1_len <= 0 || str1_len != str2_len)
+        str1_len <= 0 || str1_len != str2_len)
     {
         printf("xor_bitstrings input error\n");
         return -1;
@@ -200,6 +200,11 @@ int xor_bitstrings(uint8_t *result, uint8_t *str1, int str1_len,
     return 0;
 }
 
+/*
+pairing_t pairing: output, a fixed curve
+element_t g: output, a fixed G1
+element_t Z: output, a fixed GT
+*/
 int Setup(pairing_t pairing, element_t g, element_t Z)
 {
     int iRet = -1;
@@ -211,11 +216,11 @@ exp2 159\n\
 exp1 107\n\
 sign1 1\n\
 sign0 1";
-    // size_t count = fread(param, 1, 1024, stdin);
-    // if (!count)
-    //     pbc_die("input error");
+
     size_t count = strlen(param);
+#ifdef PRINT_DEBUG_INFO
     printf("count=%d\n", count);
+#endif
     iRet = pairing_init_set_buf(pairing, param, count);
     if (iRet != 0) {
         printf("pairing_init_set_buf return %d, exit\n", iRet);
@@ -226,6 +231,7 @@ sign0 1";
     element_from_hash(g, "31415926", strlen("31415926"));
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
+#ifdef PRINT_DEBUG_INFO
     uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
     element_to_bytes(g_bytes, g);
@@ -242,19 +248,32 @@ sign0 1";
         printf("%02x ", Z_bytes[i]);
     }
     printf("\n");
+#endif
     return 0;    
 }
 
 //Hash1 {0,1}* -> Zq
 // 注意：m是以\0结束的字符串
-void Hash1(element_t result, uint8_t * m, element_t R)
+/*
+result = Hash1(m, R);
+element_t result: output, the result of Hash1(m, R), is a Zr, must be initialized before calling
+uint8_t * m: input, is a string of '1' and '0'
+int m_len: the length of m not include the '\0'
+element_t R: input, is a GT，, must be initialized before calling
+*/
+int Hash1(element_t result, uint8_t * m, int m_len, element_t R)
 {
+    if(NULL == m || m_len <= 0)
+    {
+        printf("Hash1 input error\n");
+        return -1;
+    }
     int R_len = element_length_in_bytes(R);
     uint8_t *R_bytes = (uint8_t *) malloc(R_len);
     element_to_bytes(R_bytes, R);  // 序列化 GT 群中的元素 R
     
     // 获取输入字符串 m 的长度
-    int m_len = strlen((const char *)m);
+    // int m_len = strlen((const char *)m);
     
     // 合并 m 和 R_bytes
     uint8_t *hash_input = (uint8_t *) malloc(m_len + R_len);
@@ -273,13 +292,14 @@ void Hash1(element_t result, uint8_t * m, element_t R)
     mpz_import(hash_int, SHA256_DIGEST_LENGTH_32, 1, sizeof(hash[0]), 0, 0, hash);
 
     // 对 hash_int 取模并存入 result
-    // element_init_Zr(result, pairing);  // 初始化 result 为 Zq 上的元素，调用前需要初始化，这样就不用传递pairing了
+    // element_init_Zr(result, pairing);  //调用前需要初始化，这样就不用传递pairing了
     element_set_mpz(result, hash_int);  // 将哈希值映射到 Zq 上
     
     // 释放内存
     free(R_bytes);
     free(hash_input);
     mpz_clear(hash_int);
+    return 0;
 }
 
 //Hash2 {0,1}* -> G1
@@ -1055,7 +1075,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_Zr(r, pairing);
     
     //m是以\0结束的字符串
-    Hash1(r, m, R); 
+    Hash1(r, m, m_len-1, R); 
 
     //get c1
     element_pow_zn(ciphertext.c1, g, r);
@@ -1382,7 +1402,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     //verify g^H1(m, R) == C1
     element_t hash1result;
     element_init_Zr(hash1result, pairing);
-    Hash1(hash1result, m, R); 
+    Hash1(hash1result, m, SHA256_DIGEST_LENGTH_32 * 8, R); 
     element_t c1_2;
     element_init_G1(c1_2, pairing);
     element_pow_zn(c1_2, g, hash1result);
@@ -1793,7 +1813,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_Zr(r, pairing);
     element_init_GT(eresult, pairing);
     element_init_Zr(emuls, pairing);
-    Hash1(r, m, R); 
+    Hash1(r, m, m_len-1, R); 
     element_pow_zn(ciphertext.c1, g, r);
     element_mul(emuls, s0, r);
     element_neg(emuls, emuls);
@@ -1900,7 +1920,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     //verify g^H1(m, R) == C1
     element_t hash1result;
     element_init_Zr(hash1result, pairing);
-    Hash1(hash1result, m, R); 
+    Hash1(hash1result, m, SHA256_DIGEST_LENGTH_32 * 8, R); 
     element_t c1_2;
     element_init_G1(c1_2, pairing);
     element_pow_zn(c1_2, g, hash1result);
