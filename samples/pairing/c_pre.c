@@ -232,22 +232,24 @@ sign0 1";
     element_init_GT(Z, pairing);
     pairing_apply(Z, g, g, pairing);
 #ifdef PRINT_DEBUG_INFO
-    uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
+    uint8_t *g_bytes = (uint8_t *) malloc(g_len);
     element_to_bytes(g_bytes, g);
     printf("g_len = %d, g=\n", g_len);
     for(int i=0;i<g_len;i++){
         printf("%02x ", g_bytes[i]);
     }
     printf("\n");
-    uint8_t Z_bytes[1024];
+    free(g_bytes);
     size_t Z_len = element_length_in_bytes(Z);
+    uint8_t *Z_bytes = (uint8_t *) malloc(Z_len);
     element_to_bytes(Z_bytes, Z);
     printf("Z_len = %d, Z=\n", Z_len);
     for(int i=0;i<Z_len;i++){
         printf("%02x ", Z_bytes[i]);
     }
     printf("\n");
+    free(Z_bytes);
 #endif
     return 0;    
 }
@@ -425,225 +427,6 @@ int Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3, int c3_len
 }
 
 
-// ReKeyPair ReKeyGen(element_t ski, char* w, element_t pkj, element_t pki) //pki不在输入中
-// {
-//     ReKeyPair rk_ij;
-//     element_init_G1(rk_ij.rk1, pairing);
-//     element_init_G1(rk_ij.rk2, pairing);
-//     element_t hashresult, powresult, s, negski;
-//     element_init_G1(powresult, pairing);
-//     element_init_G1(hashresult, pairing);
-//     element_init_Zr(negski, pairing);
-//     element_init_Zr(s, pairing);
-//     element_random(s);
-//     Hash2(hashresult, pki, w);
-//     element_pow_zn(powresult, pkj, s);
-//     // element_mul(rk_ij.rk1, powresult, hashresult);
-//     element_mul(rk_ij.rk1, hashresult, powresult);
-//     element_neg(negski, ski);
-//     element_pow_zn(rk_ij.rk1, rk_ij.rk1, negski);
-//     element_pow_zn(rk_ij.rk2, pki, s);
-//     element_clear(hashresult);
-//     element_clear(powresult);
-//     element_clear(s);
-//     element_clear(negski);
-//     return rk_ij;
-// }
-
-// CipherText Enc2(element_t pk,  char* w,  char* m)
-// {
-//     CipherText ciphertext;
-//     element_init_G1(ciphertext.c1, pairing);
-//     element_init_GT(ciphertext.c2, pairing);
-//     element_init_G1(ciphertext.c4, pairing);
-//     // 为 ciphertext.c3 分配内存
-//     ciphertext.c3 = (char *) malloc(n + 1);
-//     element_t R, r, hash2result, eresult, hash4result;
-//     element_init_GT(R, pairing);
-//     element_random(R);
-//     element_init_Zr(r, pairing);
-//     element_init_G1(hash2result, pairing);
-//     element_init_GT(eresult, pairing);
-//     element_init_G1(hash4result, pairing);
-//     Hash1(r, m, R); 
-//     element_pow_zn(ciphertext.c1, g, r);
-//     Hash2(hash2result, pk, w);
-//     element_pairing(eresult, pk, hash2result);
-//     element_pow_zn(eresult, eresult, r);
-//     element_mul(ciphertext.c2, R, eresult);
-//     char *hash3result = (char *) malloc(n + 1);
-//     Hash3(hash3result, R);
-//     xor_bitstrings(ciphertext.c3, m, hash3result);
-//     Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3);
-//     element_pow_zn(ciphertext.c4, hash4result, r);
-//     element_clear(R);
-//     element_clear(r);
-//     element_clear(hash2result);
-//     element_clear(eresult);
-//     element_clear(hash4result);
-//     free(hash3result);
-//     return ciphertext;
-// }
-
-// CipherText Enc1(element_t pk, char* m)
-// {
-//     CipherText ciphertext;
-//     element_init_G1(ciphertext.c1, pairing);
-//     element_init_GT(ciphertext.c2, pairing);
-//     element_init_G1(ciphertext.c4, pairing);
-//     // 为 ciphertext.c3 分配内存
-//     ciphertext.c3 = (char *) malloc(n + 1);
-//     element_t R, r, s0, eresult, emuls;
-//     element_init_GT(R, pairing);
-//     element_random(R);
-//     element_init_Zr(s0, pairing);
-//     element_random(s0);
-//     element_init_Zr(r, pairing);
-//     element_init_GT(eresult, pairing);
-//     element_init_Zr(emuls, pairing);
-//     Hash1(r, m, R); 
-//     element_pow_zn(ciphertext.c1, g, r);
-//     element_mul(emuls, s0, r);
-//     element_neg(emuls, emuls);
-//     element_pairing(eresult, g, pk);
-//     element_pow_zn(eresult, eresult, emuls);
-//     element_mul(ciphertext.c2, R, eresult);
-//     char *hash3result = (char *) malloc(n + 1);
-//     Hash3(hash3result, R);
-//     xor_bitstrings  (ciphertext.c3, m, hash3result);
-//     element_pow_zn(ciphertext.c4, g, s0);
-//     element_clear(R);
-//     element_clear(r);
-//     element_clear(eresult);
-//     element_clear(emuls);
-//     free(hash3result);
-//     return ciphertext;
-// }
-
-// char* Dec2(CipherText CipherText, element_t sk, element_t pk, char* w)
-// {
-//     element_t hash2result, eresult, R;
-//     element_init_G1(hash2result, pairing);
-//     element_init_GT(eresult, pairing);
-//     element_init_GT(R, pairing);
-
-//     Hash2(hash2result, pk, w);
-//     element_pairing(eresult, CipherText.c1, hash2result);
-//     element_pow_zn(eresult, eresult, sk);
-//     element_invert(eresult, eresult);
-//     element_mul(R, CipherText.c2, eresult);
-//     char *hash3result = (char *) malloc(n + 1);
-//     Hash3(hash3result, R);
-//     char *m = (char *) malloc(n + 1);
-//     xor_bitstrings(m, CipherText.c3, hash3result);
-
-//     //verify g^H1(m, R) == C1
-//     element_t hash1result;
-//     element_init_Zr(hash1result, pairing);
-//     Hash1(hash1result, m, R); 
-//     element_t C1_2;
-//     element_init_G1(C1_2, pairing);
-//     element_pow_zn(C1_2, g, hash1result);
-//     if (element_cmp(C1_2, CipherText.c1) != 0) {
-//         printf("verify g^H1(m, R) == C1 fail\n");
-//         element_clear(hash1result);
-//         element_clear(C1_2);
-//         element_clear(hash2result);
-//         element_clear(eresult);
-//         element_clear(R);
-//         free(hash3result);
-//         // 处理错误，或返回 ⊥
-//         return NULL;
-//     }
-//     printf("verify g^H1(m, R) == C1 success\n");
-
-
-//     element_clear(hash2result);
-//     element_clear(eresult);
-//     element_clear(R);
-//     free(hash3result);
-//     return m;
-// }
-
-// CipherText ReEnc(CipherText CT_i, ReKeyPair rekeypair) {
-//     CipherText CT_j;
-    
-//     // 初始化 CT_j 的元素
-//     element_init_G1(CT_j.c1, pairing);
-//     element_init_GT(CT_j.c2, pairing);
-//     element_init_G1(CT_j.c4, pairing);
-//     CT_j.c3 = (char *) malloc(n + 1);  // n 是比特长度，根据需要调整
-
-//     // 计算双线性对 e(C1, H4(C1, C2, C3))
-//     element_t H4_result, pairing1, pairing2;
-//     element_init_GT(pairing1, pairing);
-//     element_init_GT(pairing2, pairing);
-//     element_init_G1(H4_result, pairing);
-
-//     // 计算 H4(C1, C2, C3)
-//     Hash4(H4_result, CT_i.c1, CT_i.c2, CT_i.c3);
-
-//     // 计算双线性对 e(C1, H4(C1, C2, C3))
-//     element_pairing(pairing1, CT_i.c1, H4_result);
-
-//     // 计算双线性对 e(g, C4)
-//     element_pairing(pairing2, g, CT_i.c4);
-
-//     // 检查双线性对是否相等
-//     if (element_cmp(pairing1, pairing2) != 0) {
-//         printf("双线性对检查失败，返回 NULL 密文\n");
-//         element_clear(CT_j.c1);
-//         element_clear(CT_j.c2);
-//         element_clear(CT_j.c4);
-//         free(CT_j.c3);
-//         // 处理错误，或返回 ⊥
-//         return CT_j;
-//     }
-
-//     // 双线性对匹配，继续重加密
-//     // C̄1 = C1
-//     element_set(CT_j.c1, CT_i.c1);
-
-//     // C̄2 = C2 · e(C1, rk1)
-//     element_t pairing3;
-//     element_init_GT(pairing3, pairing);
-//     element_pairing(pairing3, CT_i.c1, rekeypair.rk1);
-//     element_mul(CT_j.c2, CT_i.c2, pairing3);
-
-//     // C̄3 = C3 (复制第三部分)
-//     strcpy(CT_j.c3, CT_i.c3);
-
-//     // C̄4 = rk2
-//     element_set(CT_j.c4, rekeypair.rk2);
-
-//     // 清除临时变量
-//     element_clear(H4_result);
-//     element_clear(pairing1);
-//     element_clear(pairing2);
-//     element_clear(pairing3);
-//     return CT_j;
-// }
-
-// char* Dec1(CipherText CT, element_t sk, element_t pk)
-// {
-//     element_t R, eresult;
-//     element_init_GT(R, pairing);
-//     element_init_GT(eresult, pairing);
-
-//     element_pairing(eresult, CT.c1, CT.c4);
-//     element_pow_zn(eresult, eresult, sk);
-//     element_mul(R, CT.c2, eresult);
-//     char *hash3result = (char *) malloc(n + 1);
-//     Hash3(hash3result, R);
-//     char *m = (char *) malloc(n + 1);
-//     xor_bitstrings(m, CT.c3, hash3result);
-//     element_clear(R);
-//     element_clear(eresult);
-//     free(hash3result);
-//     return m;
-// }
-
-
 // #ifdef __cplusplus
 // extern "C" {
 // #endif
@@ -770,16 +553,6 @@ int Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3, int c3_len
 // #endif
 
 
-// // 生成n位的随机比特串
-// void random_bitstring(char *bitstring, int n) {
-//     time_t t;
-//     srand((unsigned) time(&t));
-//     for (int i = 0; i < n; i++) {
-//         bitstring[i] = rand() % 2 ? '1' : '0';
-//     }
-//     bitstring[n] = '\0'; 
-// }
-
 // int main_test()
 // {
 //   printf("main start\n");
@@ -809,6 +582,73 @@ int Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3, int c3_len
 // }
 
 /*
+export keypair to pk_Hex,sk_Hex
+KeyPair *p_kepair: input, should not NULL
+uint8_t *pk_Hex: output, should not NULL
+int pk_Hex_len: input, indicate the size of pk_Hex,
+    should be greater or equal than G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *sk_Hex: output, should not NULL
+int sk_Hex_len: input, indicate the size of sk_Hex,
+    should be greater or equal than ZR_ELEMENT_LENGTH_IN_BYTES * 2
+*/
+int exportKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len, 
+    uint8_t *sk_Hex, int sk_Hex_len)
+{
+    if(NULL == p_kepair || NULL == pk_Hex || NULL == sk_Hex ||
+        pk_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        sk_Hex_len < ZR_ELEMENT_LENGTH_IN_BYTES * 2)
+    {
+        printf("exportKeyPair input error\n");
+        return -1;
+    }
+    size_t pk_len = element_length_in_bytes(p_kepair->pk);
+    size_t sk_len = element_length_in_bytes(p_kepair->sk);
+    if (pk_len != G1_ELEMENT_LENGTH_IN_BYTES ||
+        sk_len != ZR_ELEMENT_LENGTH_IN_BYTES)
+    {
+        printf("pk_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", pk_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("sk_len = %d, ZR_ELEMENT_LENGTH_IN_BYTES = %d\n", sk_len, ZR_ELEMENT_LENGTH_IN_BYTES);
+        printf("p_kepair error\n");
+        return -1;
+    }
+    
+    uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
+
+    pk_len = element_to_bytes(pk_bytes, p_kepair->pk);
+    sk_len = element_to_bytes(sk_bytes, p_kepair->sk);
+#ifdef PRINT_DEBUG_INFO
+    printf("exportKeyPair:before ByteStrToHexStr, pk_len = %d, pk_bytes=\n", pk_len);
+    for(int i=0;i<pk_len;i++){
+        printf("%02x ", pk_bytes[i]);
+    }
+    printf("\n");
+    printf("exportKeyPair:before ByteStrToHexStr, sk_len = %d, sk_bytes=\n", sk_len);
+    for(int i=0;i<sk_len;i++){
+        printf("%02x ", sk_bytes[i]);
+    }
+    printf("\n");
+#endif
+    ByteStrToHexStr(pk_bytes, pk_len, pk_Hex, pk_Hex_len);
+    ByteStrToHexStr(sk_bytes, sk_len, sk_Hex, sk_Hex_len);    
+#ifdef PRINT_DEBUG_INFO
+    printf("exportKeyPair:after ByteStrToHexStr, pk_Hex=\n");
+    for(int i=0;i<pk_Hex_len;) {
+        printf("%c%c ", pk_Hex[i],pk_Hex[i+1]);
+        i+=2;
+    }
+    printf("\n");
+    printf("exportKeyPair:after ByteStrToHexStr, sk_Hex=\n");
+    for(int i=0;i<sk_Hex_len;) {
+        printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
+        i+=2;
+    }
+    printf("\n");
+#endif
+    return 0;
+}
+
+/*
 generate key
 uint8_t *pk_Hex: output, should not be null, 
         store pk in Hex string format, like "1234567890"
@@ -819,12 +659,13 @@ uint8_t *sk_Hex: output, should not be null,
 int sk_Hex_len: input, indicate the length of sk_Hex, 
         should greater or equal than ZR_ELEMENT_LENGTH_IN_BYTES * 2
 */
-
 int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********KeyGen start************\n");
     printf("********************************\n");
+#endif
     if(NULL == pk_Hex || NULL == sk_Hex ||
         (pk_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
         (sk_Hex_len < ZR_ELEMENT_LENGTH_IN_BYTES * 2)
@@ -845,92 +686,51 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
         return -1;
     }
 
-    uint8_t g_bytes[1024];
     size_t g_len = element_length_in_bytes(g);
+    uint8_t *g_bytes = (uint8_t *) malloc(g_len);
     element_to_bytes(g_bytes, g);
+#ifdef PRINT_DEBUG_INFO
     printf("g_len = %d, g=\n", g_len);
     for(int i=0;i<g_len;i++){
         printf("%02x ", g_bytes[i]);
     }
     printf("\n");
-
+#endif
     uint8_t hash[SHA256_DIGEST_LENGTH_32];
     sha256_context ctx;
     sha256_starts( &ctx );
     sha256_update( &ctx, (uint8 *) g_bytes, g_len );
     sha256_finish( &ctx, hash );
+#ifdef PRINT_DEBUG_INFO
     printf("hash(g_bytes)=\n");
     for(int i=0;i<SHA256_DIGEST_LENGTH_32;i++) {
         printf("%02x ", hash[i]);
     }
     printf("\n");
-
+#endif
 
     element_init_G1(keypair.pk, pairing);
     element_init_Zr(keypair.sk, pairing);
     element_random(keypair.sk);
     element_pow_zn(keypair.pk, g, keypair.sk);
 
-    size_t pk_len = element_length_in_bytes(keypair.pk);
-    size_t sk_len = element_length_in_bytes(keypair.sk);
-    if (pk_len != G1_ELEMENT_LENGTH_IN_BYTES ||
-        sk_len != ZR_ELEMENT_LENGTH_IN_BYTES)
+    iRet = exportKeyPair(&keypair, pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
+    if (iRet != 0)
     {
-        printf("pk_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", pk_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("sk_len = %d, ZR_ELEMENT_LENGTH_IN_BYTES = %d\n", sk_len, ZR_ELEMENT_LENGTH_IN_BYTES);
-        printf("exit \n");
-        element_clear(keypair.pk);
-        element_clear(keypair.sk);
-        element_clear(Z);
-        element_clear(g);
-        pairing_clear(pairing);
-        return -1;
+        printf("exportKeyPair return error, iRet = %d\n", iRet);
     }
-    
-    uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
-
-    pk_len = element_to_bytes(pk_bytes, keypair.pk);
-    sk_len = element_to_bytes(sk_bytes, keypair.sk);
-
-    printf("KeyGen:before ByteStrToHexStr, pk_len = %d, pk_bytes=\n", pk_len);
-    for(int i=0;i<pk_len;i++){
-        printf("%02x ", pk_bytes[i]);
-    }
-    printf("\n");
-    printf("KeyGen:before ByteStrToHexStr, sk_len = %d, sk_bytes=\n", sk_len);
-    for(int i=0;i<sk_len;i++){
-        printf("%02x ", sk_bytes[i]);
-    }
-    printf("\n");
-
-    ByteStrToHexStr(pk_bytes, pk_len, pk_Hex, pk_Hex_len);
-    ByteStrToHexStr(sk_bytes, sk_len, sk_Hex, sk_Hex_len);    
-
-    printf("KeyGen:after ByteStrToHexStr, pk_Hex=\n");
-    for(int i=0;i<pk_Hex_len;) {
-        printf("%c%c ", pk_Hex[i],pk_Hex[i+1]);
-        i+=2;
-    }
-    printf("\n");
-    printf("KeyGen:after ByteStrToHexStr, sk_Hex=\n");
-    for(int i=0;i<sk_Hex_len;) {
-        printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
-        i+=2;
-    }
-    printf("\n");
 
     element_clear(keypair.pk);
     element_clear(keypair.sk);
     element_clear(Z);
     element_clear(g);
     pairing_clear(pairing);
-
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********KeyGen end************\n");
     printf("********************************\n");
-
-    return 0;
+#endif
+    return iRet;
 }
 
 int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len, 
