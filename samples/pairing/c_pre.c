@@ -336,7 +336,7 @@ int Hash2(element_t result, element_t pk,  uint8_t * w, int w_len)
     sha256_finish( &ctx, hash );
     // element_init_G1(result, pairing); //调用前需要初始化，这样就不用传递pairing了
     // 将哈希值映射到群元素
-    element_from_hash(result, hash, SHA256_DIGEST_LENGTH_32); // result 是群元素
+    element_from_hash(result, hash, sizeof(hash)); // result 是群元素
 
     free(hash_input);
     return 0;
@@ -354,7 +354,7 @@ element_t R: input, is a GT
 int Hash3(uint8_t *bitstring, int bit_len, element_t R){
     if(NULL == bitstring || bit_len < SHA256_DIGEST_LENGTH_32 * 8 + 1)
     {
-        printf("Hash2 input error\n");
+        printf("Hash3 input error\n");
         return -1;
     }
     // 获取 G1 群元素 R 的字节表示
@@ -369,13 +369,27 @@ int Hash3(uint8_t *bitstring, int bit_len, element_t R){
     sha256_finish( &ctx, hash );
 
     // 将哈希结果转化为二进制比特串
-    bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring, bit_len);
+    bytes_to_bits(hash, sizeof(hash), bitstring, bit_len);
     // 释放内存
     free(R_bytes);
     return 0;
 }
 
-void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
+/*
+result = Hash4(c1, c2, c3)
+element_t result: output, is a G1, must be initialized before calling
+element_t c1: input
+element_t c2: input
+uint8_t* c3: input
+int c3_len: input, the length of c3, must greater than 0, not include '\0'
+*/
+int Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3, int c3_len) 
+{
+    if(NULL == c3 || c3_len <= 0)
+    {
+        printf("Hash4 input error\n");
+        return -1;
+    }
     sha256_context ctx;
     sha256_starts( &ctx );
 
@@ -384,7 +398,7 @@ void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
     // 获取 GT 群元素 c2 的字节长度
     size_t c2_len = element_length_in_bytes(c2);
     // 获取 c3 的长度
-    size_t c3_len = strlen((const char *)c3);
+    // size_t c3_len = strlen((const char *)c3);
 
     // 分配足够大的缓冲区来存储 c1, c2 和 c3 的拼接结果
     uint8_t * hash_input = (uint8_t *) malloc(c1_len + c2_len + c3_len);
@@ -405,9 +419,9 @@ void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
 
     // element_init_G1(result, pairing);////调用前需要初始化，这样就不用传递pairing了
     // 将哈希值映射到群元素 result
-    element_from_hash(result, hash, SHA256_DIGEST_LENGTH_32);  // 将哈希值映射为群元素
+    element_from_hash(result, hash, sizeof(hash));  // 将哈希值映射为群元素
     free(hash_input);
-
+    return 0;
 }
 
 
@@ -1140,7 +1154,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
 
     //hash4result在调用Hash4前需要完成初始化
     element_init_G1(hash4result, pairing);
-    Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3);
+    Hash4(hash4result, ciphertext.c1, ciphertext.c2, ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8);
     printf("ok6\n");
     //get c4
     element_pow_zn(ciphertext.c4, hash4result, r);
@@ -1310,7 +1324,7 @@ int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
     element_init_G1(hash4result, pairing);
 
     
-    Hash4(hash4result, p_ciphertext->c1, p_ciphertext->c2, p_ciphertext->c3);
+    Hash4(hash4result, p_ciphertext->c1, p_ciphertext->c2, p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8);
     pairing_apply(e1, p_ciphertext->c1, hash4result, pairing);
     pairing_apply(e2, g, p_ciphertext->c4, pairing);
     if (element_cmp(e1, e2) != 0) 
