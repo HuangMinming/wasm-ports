@@ -62,7 +62,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len,
 {
     if(NULL == src_buf || NULL == dest_buf ||
          src_len <= 0 || 
-         (src_len % 2 == 1)
+         (src_len % 2 == 1) ||
          (dest_len < src_len / 2)
          )
 	{
