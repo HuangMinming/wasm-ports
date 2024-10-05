@@ -97,7 +97,7 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len,
 /*
 "1101001100010010" --> 0xD3 0x12 \0
 uint8_t *bitstring: input, point to the source bit string
-int bit_len: input, indicate the source length, should greater than 0, should be devided by 2
+int bit_len: input, indicate the source length, should greater than 0, should be devided by 8
 uint8_t *bytes: point the destination, 
         before return ,we set bytes[bit_len/8 + 1] = '\0'
 int byte_len:input, indicate the destination length, 
@@ -136,7 +136,27 @@ int bits_to_bytes( uint8_t *bitstring, int bit_len,
     return 0;
 }
 
-void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
+/*
+0xD3 0x12 --> "1101001100010010"
+uint8_t *bytes: input, point to the source bytes string
+int byte_len: input, indicate the source length, should greater than 0
+uint8_t *bitstring: point the destination, 
+        before return ,we set bitstring[byte_len * 8 + 1] = '\0'
+int bit_len:input, indicate the destination length, 
+        should be greater or equal than bit_len * 8 + 1
+
+*/
+int bytes_to_bits( uint8_t *bytes, int byte_len, 
+    uint8_t *bitstring, int bit_len) 
+{
+    if(NULL == bytes || NULL == bitstring ||
+        byte_len < 0 || 
+        bit_len < (byte_len * 8 + 1)
+    )
+    {
+        printf("bytes_to_bits input error\n");
+        return -1;
+    }
     int i, j;
     int bit_index = 0;
     int n = byte_len * 8;
@@ -146,6 +166,7 @@ void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
         }
     }
     bitstring[bit_index] = '\0';  // 结束符
+    return 0;
 }
 
 //这里要求str1和str2的长度必须一致，否则会越界，这里都是256，
@@ -287,7 +308,7 @@ void Hash3(uint8_t *bitstring, element_t R){
     sha256_finish( &ctx, hash );
 
     // 将哈希结果转化为二进制比特串
-    bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring);
+    bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring, SHA256_DIGEST_LENGTH_32 * 8 + 1);
     // 释放内存
     free(R_bytes);
 }
@@ -985,7 +1006,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     //先把m_bytes转成bit
     int m_len = strlen((const char *)m_bytes) * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
-    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
+    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m, m_len);
     printf("m=%s\n", m);
 
     pairing_t pairing;
@@ -1721,7 +1742,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     //先把m_bytes转成bit
     int m_len = strlen((const char *)m_bytes) * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
-    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m);
+    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m, m_len);
     printf("m=%s\n", m);
 
     pairing_t pairing;
