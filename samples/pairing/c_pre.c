@@ -775,7 +775,7 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
 
     printf("KeyGen:after ByteStrToHexStr, pk_Hex=\n");
     for(int i=0;i<pk_Hex_len;) {
-        printf("%c%c ", pk_Hex[i+],pk_Hex[i+1]);
+        printf("%c%c ", pk_Hex[i],pk_Hex[i+1]);
         i+=2;
     }
     printf("\n");
@@ -1622,7 +1622,7 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_mul(CT_j.c2, CT_i.c2, pairing3);
 
     // C̄3 = C3 (复制第三部分)
-    strcpy(CT_j.c3, CT_i.c3);
+    strcpy((char *)CT_j.c3, (char *)CT_i.c3);
 
     // C̄4 = rk2
     element_set(CT_j.c4, rk_ij.rk2);
@@ -1638,7 +1638,7 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
         printf("checkEqual4 success\n");
     }
 
-    pairing_clear(pairing3);
+    element_clear(pairing3);
     element_clear(CT_j.c1);
     element_clear(CT_j.c2);
     free(CT_j.c3);
