@@ -344,7 +344,19 @@ int Hash2(element_t result, element_t pk,  uint8_t * w, int w_len)
 
 
 // Hash3 G1 -> {0,1}^n,输出的bitstring是以\0结束的字符串
-void Hash3(uint8_t *bitstring, element_t R){
+/*
+bitstring = Hash3(R)
+uint8_t *bitstring: output, is a string of '0' and '1', 
+    before return, we set bitstring[bit_len] = '\0'
+int bit_len: input, should be greater or equal than SHA256_DIGEST_LENGTH_32 * 8 + 1
+element_t R: input, is a GT
+*/
+int Hash3(uint8_t *bitstring, int bit_len, element_t R){
+    if(NULL == bitstring || bit_len < SHA256_DIGEST_LENGTH_32 * 8 + 1)
+    {
+        printf("Hash2 input error\n");
+        return -1;
+    }
     // 获取 G1 群元素 R 的字节表示
     int R_len = element_length_in_bytes(R);
     uint8_t *R_bytes = (uint8_t *) malloc(R_len);
@@ -357,9 +369,10 @@ void Hash3(uint8_t *bitstring, element_t R){
     sha256_finish( &ctx, hash );
 
     // 将哈希结果转化为二进制比特串
-    bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring, SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    bytes_to_bits(hash, SHA256_DIGEST_LENGTH_32, bitstring, bit_len);
     // 释放内存
     free(R_bytes);
+    return 0;
 }
 
 void Hash4(element_t result, element_t c1, element_t c2,  uint8_t* c3) {
@@ -1113,7 +1126,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     
     //最后以\0结束，这里需要修改，hash3result应该是256 + 1
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, R);
+    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
 
 
     printf("hash3result: %s\n",hash3result);
@@ -1402,7 +1415,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_invert(eresult, eresult);
     element_mul(R, ciphertext.c2, eresult);
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, R);
+    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
 
     printf("hash3result: %s\n",hash3result);
 
@@ -1834,7 +1847,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(eresult, eresult, emuls);
     element_mul(ciphertext.c2, R, eresult);
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, R);
+    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
     xor_bitstrings(ciphertext.c3, m, SHA256_DIGEST_LENGTH_32 * 8,
         hash3result, SHA256_DIGEST_LENGTH_32 * 8);
     element_pow_zn(ciphertext.c4, g, s0);
@@ -1925,7 +1938,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(eresult, eresult, keypair.sk);
     element_mul(R, ciphertext.c2, eresult);
     uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, R);
+    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
     uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
     xor_bitstrings(m, ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8, 
         hash3result, SHA256_DIGEST_LENGTH_32 * 8);
