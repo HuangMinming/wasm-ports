@@ -666,6 +666,11 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
     printf("**********importKeyPair start************\n");
     printf("********************************\n");
 #endif
+    if(NULL == p_kepair) 
+    {
+        print("importKeyPair error\n");
+        return -1;
+    }
     if(pk_Hex != NULL)
     {
         if(pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2))
@@ -708,7 +713,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
         uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
 #ifdef PRINT_DEBUG_INFO
         printf("importKeyPair before HexStrToByteStr, sk_Hex=\n");
-        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i) {
+        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;) {
             printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
             i += 2;
         }
@@ -819,17 +824,35 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
     return iRet;
 }
 
-
+/*
+export p_ciphertext to c1_Hex, c2_Hex, c3_Hex, c4_Hex
+CipherText *p_ciphertext: input, should not be NULL
+uint8_t *c1_Hex: output, should not be NULL
+uint8_t *c2_Hex: output, should not be NULL 
+uint8_t *c3_Hex: output, should not be NULL 
+uint8_t *c4_Hex: output, should not be NULL
+*/
+//todo: add output length check
 int exportCipherText(CipherText *p_ciphertext, 
     uint8_t *c1_Hex, 
     uint8_t *c2_Hex, 
     uint8_t *c3_Hex, 
     uint8_t *c4_Hex)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********exportCipherText start************\n");
     printf("********************************\n");
-
+#endif
+    if(NULL == p_ciphertext || NULL == p_ciphertext->c3 ||
+        NULL == c1_Hex || 
+        NULL == c2_Hex || 
+        NULL == c3_Hex || 
+        NULL == c4_Hex )
+    {
+        printf("exportCipherText input error \n");
+        return -1;
+    }
     int c1_len = element_length_in_bytes(p_ciphertext->c1);
     int c2_len = element_length_in_bytes(p_ciphertext->c2);
     int c4_len = element_length_in_bytes(p_ciphertext->c4);
@@ -853,6 +876,7 @@ int exportCipherText(CipherText *p_ciphertext,
     element_to_bytes(c1_bytes, p_ciphertext->c1);
     element_to_bytes(c2_bytes, p_ciphertext->c2);
     element_to_bytes(c4_bytes, p_ciphertext->c4);
+#ifdef PRINT_DEBUG_INFO
     printf("c1:\n");
     for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
         printf("%02x ", c1_bytes[i]);
@@ -873,19 +897,168 @@ int exportCipherText(CipherText *p_ciphertext,
         printf("%02x ", c4_bytes[i]);
     }
     printf("\n");
-
+#endif
     //c1, c2, c3, c4 convert to Hex
+    //todo, add length
     ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex, G1_ELEMENT_LENGTH_IN_BYTES *2);
     ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex, GT_ELEMENT_LENGTH_IN_BYTES * 2);
     ByteStrToHexStr(p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex, SHA256_DIGEST_LENGTH_32 * 8 * 2);
     ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex, G1_ELEMENT_LENGTH_IN_BYTES * 2);
-
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********exportCipherText end************\n");
     printf("********************************\n");
-
+#endif
     return 0;
 }
+
+/*
+import c1_Hex, c2_Hex, c3_Hex, c4_Hex to p_ciphertext
+CipherText *p_ciphertext, 
+uint8_t *c1_Hex: input, should not be NULL
+int c1_Hex_len: input, indicate the length of c1_Hex, 
+    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_Hex: input, should not be NULL
+int c2_Hex_len: input, indicate the length of c2_Hex, 
+    should equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_Hex: input, should not be NULL
+int c3_Hex_len: input, indicate the length of c3_Hex, 
+    should equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_Hex: input, should not be NULL
+int c4_Hex_len: input, indicate the length of c4_Hex, 
+    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+*/
+int importCipherText(CipherText *p_ciphertext, 
+    uint8_t *c1_Hex, int c1_Hex_len,
+    uint8_t *c2_Hex, int c2_Hex_len,
+    uint8_t *c3_Hex, int c3_Hex_len,
+    uint8_t *c4_Hex, int c4_Hex_len)
+{
+#ifdef PRINT_DEBUG_INFO
+    printf("********************************\n");
+    printf("**********importCipherText start************\n");
+    printf("********************************\n");
+#endif
+    if(NULL == p_ciphertext ||
+       NULL == c1_Hex || NULL == c2_Hex ||
+       NULL == c3_Hex || NULL == c4_Hex)
+    {
+        printf("importCipherText input error\n");
+        return -1;
+    }
+    if(
+       c1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       c2_Hex_len != (GT_ELEMENT_LENGTH_IN_BYTES * 2) ||
+       c3_Hex_len != (SHA256_DIGEST_LENGTH_32 * 8 * 2) ||
+       c4_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) )
+    {
+        printf("c1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
+            c1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("c2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
+            c2_Hex_len, GT_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("c3_Hex_len = %d, c3_Hex_len should equal to  %d\n", 
+            c3_Hex_len, SHA256_DIGEST_LENGTH_32 * 8 * 2);
+        printf("c4_Hex_len = %d, c4_Hex_len should equal to  %d\n", 
+            c4_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);  
+        return -1;
+    }
+
+    //import c1
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText before HexStrToByteStr, c1_Hex=\n");
+    for(int i=0;i<c1_Hex_len;) {
+        printf("%c%c ", c1_Hex[i], c1_Hex[i+1]);
+        i += 2;
+    }
+    printf("\n");
+#endif
+    uint8_t c1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes, sizeof(c1_bytes));
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText  after HexStrToByteStr, c1_bytes=\n");
+    for(int i=0;i<c1_Hex_len/2;i++) {
+        printf("%02x ", c1_bytes[i]);
+    }
+    printf("\n");
+#endif
+    //p_ciphertext->c1需要在调用importCipherText前完成初始化
+    int c1_len = element_from_bytes(p_ciphertext->c1, (uint8_t *)c1_bytes);
+
+    //import c2
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText before HexStrToByteStr, c2_Hex=\n");
+    for(int i=0;i<c2_Hex_len;i++) {
+        printf("%c%c ", c2_Hex[i], c2_Hex[i+1]);
+        i += 2;
+    }
+    printf("\n");
+#endif
+    uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
+    HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes, sizeof(c2_bytes));
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText after HexStrToByteStr, c2_bytes=\n");
+    for(int i=0;i<c2_Hex_len/2;i++) {
+        printf("%02x ", c2_bytes[i]);
+    }
+    printf("\n");
+#endif
+    //p_ciphertext->c2需要在调用importCipherText前完成初始化
+    int c2_len = element_from_bytes(p_ciphertext->c2, (uint8_t *)c2_bytes);
+
+    //import c3
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText before HexStrToByteStr, c3_Hex=\n");
+    for(int i=0;i<c3_Hex_len;) {
+        printf("%c%c ", c3_Hex[i], c3_Hex[i+1]);
+        i += 2;
+    }
+    printf("\n");
+#endif
+    uint8_t c3_bytes[SHA256_DIGEST_LENGTH_32 * 8];
+    HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes, sizeof(c3_bytes));
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText after HexStrToByteStr, c3_bytes=\n");
+    for(int i=0;i<c3_Hex_len/2;i++) {
+        printf("%02x ", c3_bytes[i]);
+    }
+    printf("\n");
+#endif
+    //p_ciphertext->c3需要在调用importCipherText前完成内存分配
+    memcpy(p_ciphertext->c3, c3_bytes, sizeof(c3_bytes));
+    //确保c3以'\0'结束
+    p_ciphertext->c3[sizeof(c3_bytes)] = '\0';
+
+
+    //import c4
+#ifdef PRINT_DEBUG_INFO
+    printf("importCipherText before HexStrToByteStr, c4_Hex=\n");
+    for(int i=0;i<c4_Hex_len;) {
+        printf("%c%c ", c4_Hex[i], c4_Hex[i+1]);
+        i += 2;
+    }
+    printf("\n");
+#endif
+    uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes, sizeof(c4_bytes));
+    printf("importCipherText after HexStrToByteStr, c4_bytes=\n");
+    for(int i=0;i<c4_Hex_len/2;i++) {
+        printf("%02x ", c4_bytes[i]);
+    }
+    printf("\n");
+
+    //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
+    // element_init_G1(ciphertext->c4, pairing); 
+    int c4_len = element_from_bytes(p_ciphertext->c4, (uint8_t *)c4_bytes);
+
+
+#ifdef PRINT_DEBUG_INFO
+    printf("********************************\n");
+    printf("**********importCipherText end************\n");
+    printf("********************************\n");
+#endif
+    return 0;
+}
+
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
@@ -1029,112 +1202,6 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     return 0;
 }
 
-int importCipherText(CipherText *p_ciphertext, 
-    uint8_t *c1_Hex, int c1_Hex_len,
-    uint8_t *c2_Hex, int c2_Hex_len,
-    uint8_t *c3_Hex, int c3_Hex_len,
-    uint8_t *c4_Hex, int c4_Hex_len)
-{
-    printf("********************************\n");
-    printf("**********importCipherText start************\n");
-    printf("********************************\n");
-    if(c1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       c2_Hex_len != (GT_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       c3_Hex_len != (SHA256_DIGEST_LENGTH_32 * 8 * 2) ||
-       c4_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) )
-    {
-        printf("c1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
-            c1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("c2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
-            c2_Hex_len, GT_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("c3_Hex_len = %d, c3_Hex_len should equal to  %d\n", 
-            c3_Hex_len, SHA256_DIGEST_LENGTH_32 * 8 * 2);
-        printf("c4_Hex_len = %d, c4_Hex_len should equal to  %d\n", 
-            c4_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);  
-        return -1;
-    }
-
-    //import c1
-    uint8_t c1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, c1_Hex=\n");
-    for(int i=0;i<c1_Hex_len;i++) {
-        printf("%c", (unsigned int)c1_Hex[i]);
-    }
-    printf("\n");
-    HexStrToByteStr((uint8_t *)c1_Hex, c1_Hex_len, c1_bytes, sizeof(c1_bytes));
-    printf("after HexStrToByteStr, c1_bytes=\n");
-    for(int i=0;i<c1_Hex_len/2;i++) {
-        printf("%02x ", c1_bytes[i]);
-    }
-    printf("\n");
-
-    //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
-    // element_init_G1(ciphertext->c1, pairing); 
-    int c1_len = element_from_bytes(p_ciphertext->c1, (uint8_t *)c1_bytes);
-
-    //import c2
-    uint8_t c2_bytes[GT_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, c2_Hex=\n");
-    for(int i=0;i<c2_Hex_len;i++) {
-        printf("%c", (unsigned int)c2_Hex[i]);
-    }
-    printf("\n");
-    HexStrToByteStr((uint8_t *)c2_Hex, c2_Hex_len, c2_bytes, sizeof(c2_bytes));
-    printf("after HexStrToByteStr, c2_bytes=\n");
-    for(int i=0;i<c2_Hex_len/2;i++) {
-        printf("%02x ", c2_bytes[i]);
-    }
-    printf("\n");
-
-    //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
-    // element_init_GT(ciphertext->c2, pairing); 
-    int c2_len = element_from_bytes(p_ciphertext->c2, (uint8_t *)c2_bytes);
-
-    //import c3
-    uint8_t c3_bytes[SHA256_DIGEST_LENGTH_32 * 8];
-    printf("before HexStrToByteStr, c3_Hex=\n");
-    for(int i=0;i<c3_Hex_len;i++) {
-        printf("%c", (unsigned int)c3_Hex[i]);
-    }
-    printf("\n");
-    HexStrToByteStr((uint8_t *)c3_Hex, c3_Hex_len, c3_bytes, sizeof(c3_bytes));
-    printf("after HexStrToByteStr, c3_bytes=\n");
-    for(int i=0;i<c3_Hex_len/2;i++) {
-        printf("%02x ", c3_bytes[i]);
-    }
-    printf("\n");
-
-    //ciphertext需要在调用importCipherText前完成初始化
-    memcpy(p_ciphertext->c3, c3_bytes, SHA256_DIGEST_LENGTH_32 * 8);
-    //确保c3 已\0结束
-    p_ciphertext->c3[SHA256_DIGEST_LENGTH_32 * 8] = '\0';
-
-
-    //import c4
-    uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, c4_Hex=\n");
-    for(int i=0;i<c4_Hex_len;i++) {
-        printf("%c", (unsigned int)c4_Hex[i]);
-    }
-    printf("\n");
-    HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes, sizeof(c4_bytes));
-    printf("after HexStrToByteStr, c4_bytes=\n");
-    for(int i=0;i<c4_Hex_len/2;i++) {
-        printf("%02x ", c4_bytes[i]);
-    }
-    printf("\n");
-
-    //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
-    // element_init_G1(ciphertext->c4, pairing); 
-    int c4_len = element_from_bytes(p_ciphertext->c4, (uint8_t *)c4_bytes);
-
-
-
-    printf("********************************\n");
-    printf("**********importCipherText end************\n");
-    printf("********************************\n");
-    return 0;
-}
 
 int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
 {
