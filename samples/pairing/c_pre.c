@@ -668,7 +668,7 @@ int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
 #endif
     if(NULL == p_kepair) 
     {
-        print("importKeyPair error\n");
+        printf("importKeyPair error\n");
         return -1;
     }
     if(pk_Hex != NULL)
