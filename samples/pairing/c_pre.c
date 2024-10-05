@@ -11,9 +11,10 @@
 /*
 [0x23, 0x3A, 0x46, 0x4C, 0x52] ==> “233A464C52”
 const uint8_t * src_buf: input, point to the source
-int src_len: input, indicate the length, should greater than 0
+int src_len: input, indicate the source length, should greater than 0
 uint8_t * dest_buf: output, point to the destination
-int dest_len: input, should be greater or equal than src_len * 2
+int dest_len: input, indicate the destination length, 
+        should be greater or equal than src_len * 2
 */
 uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len, 
     uint8_t * dest_buf, int dest_len)
@@ -53,16 +54,17 @@ uint32_t ByteStrToHexStr(const uint8_t * src_buf, int src_len,
 /*
  “233A464C52” ==>[0x23, 0x3A, 0x46, 0x4C, 0x52]
 const uint8_t * src_buf: input, point to the source
-int src_len: input, indicate the length, should greater than 0, should be devided by 2
+int src_len: input, indicate the source length, should greater than 0, should be devided by 2
 uint8_t * dest_buf: output, point to the destination
-int dest_len: input, should be greater or equal than src_len / 2
+int dest_len: input, indicate the destination length, 
+        should be greater or equal than src_len / 2
 */
 uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len, 
     uint8_t * dest_buf, int dest_len)
 {
     if(NULL == src_buf || NULL == dest_buf ||
          src_len <= 0 || 
-         (src_len % 2 == 1) ||
+         (src_len % 2 != 0) ||
          (dest_len < src_len / 2)
          )
 	{
@@ -92,9 +94,31 @@ uint32_t HexStrToByteStr(const uint8_t * src_buf, int src_len,
     }
     return 0;
 }
-// "11010011" --> 0xD3
-void bits_to_bytes( uint8_t *bitstring, int bit_len, uint8_t *bytes) {
+/*
+"1101001100010010" --> 0xD3 0x12 \0
+uint8_t *bitstring: input, point to the source bit string
+int bit_len: input, indicate the source length, should greater than 0, should be devided by 2
+uint8_t *bytes: point the destination, 
+        before return ,we set bytes[bit_len/8 + 1] = '\0'
+int byte_len:input, indicate the destination length, 
+        should be greater or equal than bit_len / 8 + 1
+
+*/
+void bits_to_bytes( uint8_t *bitstring, int bit_len, 
+        uint8_t *bytes, int byte_len) 
+{
+    if(NULL == bitstring || NULL == bytes ||
+        bit_len < 0 || 
+        (bit_len % 8 != 0) ||
+        byte_len < (bit_len / 8 + 1)
+    )
+    {
+        printf("bits_to_bytes input error\n");
+        return -1;
+    }
+#ifdef PRINT_DEBUG_INFO
     printf("bits_to_bytes, bitstring = %s\n", bitstring);
+#endif
     int i, j;
     int byte_index = 0;
     int n = bit_len / 8;
@@ -1345,7 +1369,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         return -1;
     }
     printf("verify g^H1(m, R) == c1 success\n");
-    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes);
+    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes, m_bytes_len);
     printf("m_bytes = %s\n", m_bytes);
  
     element_clear(c1_2);
@@ -1858,7 +1882,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         pairing_clear(pairing);	
     }
     printf("Dec1 verify g^H1(m, R) == c1 success\n");
-    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes);
+    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes, m_bytes_len);
     printf("m_bytes = %s\n", m_bytes);
 
     element_clear(c1_2);
