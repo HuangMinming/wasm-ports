@@ -104,7 +104,7 @@ int byte_len:input, indicate the destination length,
         should be greater or equal than bit_len / 8 + 1
 
 */
-void bits_to_bytes( uint8_t *bitstring, int bit_len, 
+int bits_to_bytes( uint8_t *bitstring, int bit_len, 
         uint8_t *bytes, int byte_len) 
 {
     if(NULL == bitstring || NULL == bytes ||
@@ -133,6 +133,7 @@ void bits_to_bytes( uint8_t *bitstring, int bit_len,
         byte_index ++;
     }
     bytes[byte_index] = '\0';  // 结束符
+    retur 0;
 }
 
 void bytes_to_bits( uint8_t *bytes, int byte_len, uint8_t *bitstring) {
