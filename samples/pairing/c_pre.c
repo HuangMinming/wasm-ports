@@ -258,8 +258,8 @@ sign0 1";
 result = Hash1(m, R);
 element_t result: output, the result of Hash1(m, R), is a Zr, must be initialized before calling
 uint8_t * m: input, is a string of '1' and '0'
-int m_len: the length of m not include the '\0'
-element_t R: input, is a GT，, must be initialized before calling
+int m_len: input, the length of m not include the '\0'
+element_t R: input, is a GT, must be initialized before calling
 */
 int Hash1(element_t result, uint8_t * m, int m_len, element_t R)
 {
@@ -304,14 +304,26 @@ int Hash1(element_t result, uint8_t * m, int m_len, element_t R)
 
 //Hash2 {0,1}* -> G1
 // 注意：w是以\0结束的字符串
-void Hash2(element_t result, element_t pk,  uint8_t * w) {
-
+/*
+result = Hash2(pk, w);
+element_t result：output, the result of Hash2(pk, w), is a G1, must be initialized before calling
+element_t pk：input, public key, is a G1, must set the right value 
+uint8_t * w: input, is a string 
+int w_len: input, the length of m not include the '\0'
+*/
+int Hash2(element_t result, element_t pk,  uint8_t * w, int w_len) 
+{
+    if(NULL == w || w_len <= 0)
+    {
+        printf("Hash2 input error\n");
+        return -1;
+    }
     sha256_context ctx;
     sha256_starts( &ctx );
 
     uint8_t hash[SHA256_DIGEST_LENGTH_32];
     size_t pk_len = element_length_in_bytes(pk);
-    size_t w_len = strlen((const char *)w);
+    // size_t w_len = strlen((const char *)w);
     uint8_t * hash_input = (uint8_t *) malloc(pk_len + w_len);
 
     // 将 pk 转换为字节形式
@@ -327,6 +339,7 @@ void Hash2(element_t result, element_t pk,  uint8_t * w) {
     element_from_hash(result, hash, SHA256_DIGEST_LENGTH_32); // result 是群元素
 
     free(hash_input);
+    return 0;
 }
 
 
@@ -1082,7 +1095,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
 
     //hash2result在调用Hash2前需要完成初始化，w是以\0结束的字符串
     element_init_G1(hash2result, pairing);
-    Hash2(hash2result, keypair.pk, w);
+    Hash2(hash2result, keypair.pk, w, strlen((char *)w));
 
     uint8_t hash2result_bytes[8196];
     int len = element_to_bytes(hash2result_bytes, hash2result); 
@@ -1372,7 +1385,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_GT(eresult, pairing);
     element_init_GT(R, pairing);
 
-    Hash2(hash2result, keypair.pk, w);
+    Hash2(hash2result, keypair.pk, w, strlen((char *)w));
 
     uint8_t hash2result_bytes[8196];
     int len = element_to_bytes(hash2result_bytes, hash2result); 
@@ -1603,7 +1616,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_init_Zr(negski, pairing);
     element_init_Zr(s, pairing);
     element_random(s);
-    Hash2(hash2result, keypair_i.pk, w);
+    Hash2(hash2result, keypair_i.pk, strlen((char *)w));
     element_pow_zn(powresult, keypair_j.pk, s);
     element_mul(rk_ij.rk1, hash2result, powresult);
     element_neg(negski, keypair_i.sk);
