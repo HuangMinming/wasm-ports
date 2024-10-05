@@ -649,6 +649,92 @@ int exportKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len,
 }
 
 /*
+import pk_Hex,sk_Hex to keypair
+KeyPair *p_kepair: output,  must be initialized before calling
+uint8_t *pk_Hex: input, if it is NULL, skip import to p_kepair->pk
+int pk_Hex_len: input, indicate the size of pk_Hex,
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *sk_Hex: input, if it is NULL, skip import to p_kepair->sk
+int sk_Hex_len: input, indicate the size of sk_Hex,
+    should be equal to ZR_ELEMENT_LENGTH_IN_BYTES * 2
+*/
+int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len, 
+    uint8_t *sk_Hex, int sk_Hex_len)
+{
+#ifdef PRINT_DEBUG_INFO
+    printf("********************************\n");
+    printf("**********importKeyPair start************\n");
+    printf("********************************\n");
+#endif
+    if(pk_Hex != NULL)
+    {
+        if(pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2))
+        {
+            printf("pk_Hex_len = %d, pk_Hex_len should equal to  %d\n", 
+                pk_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+            return -1;
+        }
+        //import pk
+        uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+#ifdef PRINT_DEBUG_INFO
+        printf("importKeyPair before HexStrToByteStr, pk_Hex=\n");
+        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;) {
+            printf("%c%c ", pk_Hex[i], pk_Hex[i+1]);
+            i += 2;
+        }
+        printf("\n");
+#endif
+        HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes, sizeof(pk_bytes));
+#ifdef PRINT_DEBUG_INFO
+        printf("importKeyPair after HexStrToByteStr, pk_bytes=\n");
+        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+            printf("%02x ", pk_bytes[i]);
+        }
+        printf("\n");
+#endif
+        //在调用importKeyPair前完成p_kepair->pk初始化
+        int pk_len = element_from_bytes(p_kepair->pk, (uint8_t *)pk_bytes);
+    }
+
+    if(sk_Hex != NULL)
+    {
+        if(sk_Hex_len != (ZR_ELEMENT_LENGTH_IN_BYTES * 2))
+        {
+            printf("sk_Hex_len = %d, sk_Hex_len should equal to  %d\n", 
+                sk_Hex_len, ZR_ELEMENT_LENGTH_IN_BYTES * 2);
+            return -1;
+        }
+        //import sk
+        uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
+#ifdef PRINT_DEBUG_INFO
+        printf("importKeyPair before HexStrToByteStr, sk_Hex=\n");
+        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i) {
+            printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
+            i += 2;
+        }
+        printf("\n");
+#endif
+        HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes, sizeof(sk_bytes));
+#ifdef PRINT_DEBUG_INFO
+        printf("importKeyPair after HexStrToByteStr, sk_bytes=\n");
+        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
+            printf("%02x ", sk_bytes[i]);
+        }
+        printf("\n");
+#endif
+        //在调用importKeyPair前完成p_kepair->sk初始化
+        int pk_len = element_from_bytes(p_kepair->sk, (uint8_t *)sk_bytes);
+    }
+#ifdef PRINT_DEBUG_INFO   
+    printf("********************************\n");
+    printf("**********importKeyPair end************\n");
+    printf("********************************\n");
+#endif
+    return 0;
+}
+
+
+/*
 generate key
 uint8_t *pk_Hex: output, should not be null, 
         store pk in Hex string format, like "1234567890"
@@ -733,69 +819,6 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
     return iRet;
 }
 
-int importKeyPair(KeyPair *p_kepair, uint8_t *pk_Hex, int pk_Hex_len, 
-    uint8_t *sk_Hex, int sk_Hex_len)
-{
-    printf("********************************\n");
-    printf("**********importKeyPair start************\n");
-    printf("********************************\n");
-    if(pk_Hex != NULL)
-    {
-        if(pk_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2))
-        {
-            printf("pk_Hex_len = %d, pk_Hex_len should equal to  %d\n", 
-            pk_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        }
-        //import pk
-        uint8_t pk_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-        printf("before HexStrToByteStr, pk_Hex=\n");
-        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-            printf("%c", (unsigned int)pk_Hex[i]);
-        }
-        printf("\n");
-        HexStrToByteStr((uint8_t *)pk_Hex, pk_Hex_len, pk_bytes, sizeof(pk_bytes));
-        printf("after HexStrToByteStr, pk_bytes=\n");
-        for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
-            printf("%02x ", pk_bytes[i]);
-        }
-        printf("\n");
-
-        //在调用importKeyPair前完成初始化
-        // element_init_G1(keypair.pk, pairing); 
-        int pk_len = element_from_bytes(p_kepair->pk, (uint8_t *)pk_bytes);
-    }
-
-    if(sk_Hex != NULL)
-    {
-        if(sk_Hex_len != (ZR_ELEMENT_LENGTH_IN_BYTES * 2))
-        {
-            printf("sk_Hex_len = %d, sk_Hex_len should equal to  %d\n", 
-            sk_Hex_len, ZR_ELEMENT_LENGTH_IN_BYTES * 2);
-        }
-        //import sk
-        uint8_t sk_bytes[ZR_ELEMENT_LENGTH_IN_BYTES];
-        printf("before HexStrToByteStr, sk_Hex=\n");
-        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES * 2;i++) {
-            printf("%c", (unsigned int)sk_Hex[i]);
-        }
-        printf("\n");
-        HexStrToByteStr((uint8_t *)sk_Hex, sk_Hex_len, sk_bytes, sizeof(sk_bytes));
-        printf("after HexStrToByteStr, sk_bytes=\n");
-        for(int i=0;i<ZR_ELEMENT_LENGTH_IN_BYTES;i++) {
-            printf("%02x ", sk_bytes[i]);
-        }
-        printf("\n");
-
-        //在调用importKeyPair前完成初始化
-        // element_init_Zr(keypair.sk, pairing); 
-        int pk_len = element_from_bytes(p_kepair->sk, (uint8_t *)sk_bytes);
-    }
-    
-    printf("********************************\n");
-    printf("**********importKeyPair end************\n");
-    printf("********************************\n");
-    return 0;
-}
 
 int exportCipherText(CipherText *p_ciphertext, 
     uint8_t *c1_Hex, 
