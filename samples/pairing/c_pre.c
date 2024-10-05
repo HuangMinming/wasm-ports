@@ -1616,7 +1616,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_init_Zr(negski, pairing);
     element_init_Zr(s, pairing);
     element_random(s);
-    Hash2(hash2result, keypair_i.pk, strlen((char *)w));
+    Hash2(hash2result, keypair_i.pk, w, strlen((char *)w));
     element_pow_zn(powresult, keypair_j.pk, s);
     element_mul(rk_ij.rk1, hash2result, powresult);
     element_neg(negski, keypair_i.sk);
