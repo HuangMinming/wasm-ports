@@ -1226,12 +1226,19 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     return iRet;
 }
 
-
+/*
+check e(C1, H4(C1, C2, C3)) == e(g, C4)
+pairing_t pairing: input, 
+element_t g: input
+CipherText *p_ciphertext: input, point to the cipherText, should not be NULL
+*/
 int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********checkEqual4 start************\n");
     printf("********************************\n");
+#endif
     element_t e1, e2, hash4result;
     element_init_GT(e1, pairing);
     element_init_GT(e2, pairing);
