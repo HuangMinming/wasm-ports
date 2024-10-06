@@ -825,19 +825,27 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
 }
 
 /*
-export p_ciphertext to c1_Hex, c2_Hex, c3_Hex, c4_Hex
+export p_ciphertext to c1_Hex, c2_Hex, c3_Hex, c4_Hex in Hex string format
 CipherText *p_ciphertext: input, should not be NULL
 uint8_t *c1_Hex: output, should not be NULL
+int c1_Hex_len: the size of c1_Hex, 
+    should be greater or equal than G1_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *c2_Hex: output, should not be NULL 
+int c1_Hex_len: the size of c2_Hex, 
+    should be greater or equal than GT_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *c3_Hex: output, should not be NULL 
+int c1_Hex_len: the size of c3_Hex, 
+    should be greater or equal than SHA256_DIGEST_LENGTH_32 * 8 * 2
 uint8_t *c4_Hex: output, should not be NULL
+int c1_Hex_len: the size of c4_Hex, 
+    should be greater or equal than G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
-//todo: add output length check
+
 int exportCipherText(CipherText *p_ciphertext, 
-    uint8_t *c1_Hex, 
-    uint8_t *c2_Hex, 
-    uint8_t *c3_Hex, 
-    uint8_t *c4_Hex)
+    uint8_t *c1_Hex, int c1_Hex_len, 
+    uint8_t *c2_Hex, int c2_Hex_len, 
+    uint8_t *c3_Hex, int c3_Hex_len, 
+    uint8_t *c4_Hex, int c4_Hex_len)
 {
 #ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
@@ -845,16 +853,17 @@ int exportCipherText(CipherText *p_ciphertext,
     printf("********************************\n");
 #endif
     if(NULL == p_ciphertext || NULL == p_ciphertext->c3 ||
-        NULL == c1_Hex || 
-        NULL == c2_Hex || 
-        NULL == c3_Hex || 
-        NULL == c4_Hex )
+        NULL == c1_Hex || c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == c2_Hex || c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == c3_Hex || c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 ||
+        NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("exportCipherText input error \n");
         return -1;
     }
     int c1_len = element_length_in_bytes(p_ciphertext->c1);
     int c2_len = element_length_in_bytes(p_ciphertext->c2);
+    int c3_len = SHA256_DIGEST_LENGTH_32 * 8;
     int c4_len = element_length_in_bytes(p_ciphertext->c4);
     if (c1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
         c2_len != GT_ELEMENT_LENGTH_IN_BYTES ||
@@ -878,32 +887,32 @@ int exportCipherText(CipherText *p_ciphertext,
     element_to_bytes(c4_bytes, p_ciphertext->c4);
 #ifdef PRINT_DEBUG_INFO
     printf("c1:\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+    for(int i=0;i<sizeof(c1_bytes);i++) {
         printf("%02x ", c1_bytes[i]);
     }
     printf("\n");
     printf("c2:\n");
-    for(int i=0;i<GT_ELEMENT_LENGTH_IN_BYTES;i++) {
+    for(int i=0;i<sizeof(c2_bytes);i++) {
         printf("%02x ", c2_bytes[i]);
     }
     printf("\n");
     printf("c3:\n");
-    for(int i=0;i<SHA256_DIGEST_LENGTH_32 * 8;i++) {
+    for(int i=0;i<c3_len;i++) {
         printf("%02x ", p_ciphertext->c3[i]);
     }
     printf("\n");
     printf("c4:\n");
-    for(int i=0;i<G1_ELEMENT_LENGTH_IN_BYTES;i++) {
+    for(int i=0;i<sizeof(c4_bytes);i++) {
         printf("%02x ", c4_bytes[i]);
     }
     printf("\n");
 #endif
     //c1, c2, c3, c4 convert to Hex
     //todo, add length
-    ByteStrToHexStr(c1_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c1_Hex, G1_ELEMENT_LENGTH_IN_BYTES *2);
-    ByteStrToHexStr(c2_bytes, GT_ELEMENT_LENGTH_IN_BYTES, c2_Hex, GT_ELEMENT_LENGTH_IN_BYTES * 2);
-    ByteStrToHexStr(p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8, c3_Hex, SHA256_DIGEST_LENGTH_32 * 8 * 2);
-    ByteStrToHexStr(c4_bytes, G1_ELEMENT_LENGTH_IN_BYTES, c4_Hex, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+    ByteStrToHexStr(c1_bytes, sizeof(c1_bytes), c1_Hex, c1_Hex_len);
+    ByteStrToHexStr(c2_bytes, sizeof(c2_bytes), c2_Hex, c2_Hex_len);
+    ByteStrToHexStr(p_ciphertext->c3, c3_len, c3_Hex, c3_Hex_len);
+    ByteStrToHexStr(c4_bytes, sizeof(c4_bytes), c4_Hex, c4_Hex_len);
 #ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********exportCipherText end************\n");
@@ -1066,7 +1075,10 @@ int importCipherText(CipherText *p_ciphertext,
 int Enc2(uint8_t *pk_Hex, int pk_Hex_len, 
     uint8_t *m_bytes,
     uint8_t *w,
-    uint8_t *c1_Hex, uint8_t *c2_Hex, uint8_t *c3_Hex, uint8_t *c4_Hex
+    uint8_t *c1_Hex, int c1_Hex_len,
+    uint8_t *c2_Hex, int c2_Hex_len,
+    uint8_t *c3_Hex, int c3_Hex_len,
+    uint8_t *c4_Hex, int c4_Hex_len
     )
 {
     printf("********************************\n");
@@ -1156,7 +1168,10 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(ciphertext.c4, hash4result, r);
 
     //c1, c2, c4 conver to bytes
-    iRet = exportCipherText(&ciphertext, c1_Hex, c2_Hex, c3_Hex, c4_Hex);
+    iRet = exportCipherText(&ciphertext, c1_Hex, c1_Hex_len,
+            c2_Hex, c2_Hex_len, 
+            c3_Hex, c3_Hex_len, 
+            c4_Hex, c4_Hex_len);
     if(iRet != 0) 
     {
         printf("exportCipherText return = %d\n", iRet);
@@ -1570,8 +1585,10 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     uint8_t *c4_i_Hex, int c4_i_Hex_len,
     uint8_t *rk1_Hex, int rk1_Hex_len,
     uint8_t *rk2_Hex, int rk2_Hex_len,
-    uint8_t *c1_j_Hex, uint8_t *c2_j_Hex,
-    uint8_t *c3_j_Hex, uint8_t *c4_j_Hex
+    uint8_t *c1_j_Hex, int c1_j_Hex_len, 
+    uint8_t *c2_j_Hex, int c2_j_Hex_len, 
+    uint8_t *c3_j_Hex, int c3_j_Hex_len, 
+    uint8_t *c4_j_Hex, int c4_j_Hex_len
     )
 {
     printf("********************************\n");
@@ -1653,7 +1670,10 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_set(CT_j.c4, rk_ij.rk2);
 
 
-    iRet = exportCipherText(&CT_j, c1_j_Hex, c2_j_Hex, c3_j_Hex, c4_j_Hex);
+    iRet = exportCipherText(&CT_j, c1_j_Hex, c1_j_Hex_len, 
+        c2_j_Hex, c2_j_Hex_len, 
+        c3_j_Hex, c3_j_Hex_len, 
+        c4_j_Hex, c4_j_Hex_len);
     if(iRet != 0) 
     {
         printf("checkEqual4 fail, return %d\n", iRet);
@@ -1697,7 +1717,10 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
 //m是AES-GCM key，长度是256bit，32字节
 int Enc1(uint8_t *pk_Hex, int pk_Hex_len, 
     uint8_t *m_bytes,
-    uint8_t *c1_Hex, uint8_t *c2_Hex, uint8_t *c3_Hex, uint8_t *c4_Hex
+    uint8_t *c1_Hex, int c1_Hex_len, 
+    uint8_t *c2_Hex, int c2_Hex_len, 
+    uint8_t *c3_Hex, int c3_Hex_len, 
+    uint8_t *c4_Hex, int c4_Hex_len
     )
 {
     printf("********************************\n");
@@ -1757,7 +1780,10 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_pow_zn(ciphertext.c4, g, s0);
 
     //export ciphertext
-    exportCipherText(&ciphertext, c1_Hex, c2_Hex, c3_Hex, c4_Hex);
+    exportCipherText(&ciphertext, c1_Hex, c1_Hex_len, 
+        c2_Hex, c2_Hex_len, 
+        c3_Hex, c3_Hex_len, 
+        c4_Hex, c4_Hex_len);
 
     free(hash3result);
     element_clear(emuls);
@@ -1923,7 +1949,10 @@ void Enc2Test()
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc2(pk_Hex, pk_Hex_len, m, w, c1_Hex,c2_Hex,c3_Hex,c4_Hex);
+    Enc2(pk_Hex, pk_Hex_len, m, w, c1_Hex, sizeof(c1_Hex), 
+        c2_Hex, sizeof(c2_Hex), 
+        c3_Hex, sizeof(c3_Hex), 
+        c4_Hex, sizeof(c4_Hex));
 
     printf("c1:\n");
     for(int i=0;i<sizeof(c1_Hex);i++) {
@@ -1980,7 +2009,10 @@ void Enc1Test()
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc1(pk_Hex, pk_Hex_len, m, c1_Hex,c2_Hex,c3_Hex,c4_Hex);
+    Enc1(pk_Hex, pk_Hex_len, m, c1_Hex, sizeof(c1_Hex), 
+        c2_Hex, sizeof(c2_Hex), 
+        c3_Hex, sizeof(c3_Hex), 
+        c4_Hex, sizeof(c4_Hex));
 
     printf("c1:\n");
     for(int i=0;i<sizeof(c1_Hex);i++) {
@@ -2030,7 +2062,10 @@ void ReEncTest()
     uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     Enc2(pk_i_Hex, pk_i_Hex_len, m, w, 
-        c1_i_Hex,c2_i_Hex,c3_i_Hex,c4_i_Hex);
+        c1_i_Hex, sizeof(c1_i_Hex), 
+        c2_i_Hex, sizeof(c2_i_Hex), 
+        c3_i_Hex, sizeof(c3_i_Hex), 
+        c4_i_Hex, sizeof(c4_i_Hex));
 
     uint8_t pk_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t sk_j_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
@@ -2058,7 +2093,10 @@ void ReEncTest()
         c4_i_Hex, sizeof(c4_i_Hex),
         rk1_Hex, sizeof(rk1_Hex),
         rk2_Hex, sizeof(rk2_Hex),
-        c1_j_Hex, c2_j_Hex, c3_j_Hex, c4_j_Hex);
+        c1_j_Hex, sizeof(c1_j_Hex),
+        c2_j_Hex, sizeof(c2_j_Hex),
+        c3_j_Hex, sizeof(c3_j_Hex),
+        c4_j_Hex, sizeof(c4_j_Hex));
     
     uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
     Dec1(pk_j_Hex, sizeof(pk_j_Hex), sk_j_Hex, sizeof(sk_j_Hex),
