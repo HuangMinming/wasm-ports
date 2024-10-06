@@ -1216,7 +1216,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(keypair.pk);
     element_clear(Z);
     element_clear(g);
-    pairing_clear(pairing)
+    pairing_clear(pairing);
 #ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********Enc2 end************\n");
@@ -1958,7 +1958,8 @@ void Enc2Test()
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc2(pk_Hex, pk_Hex_len, m, w, c1_Hex, sizeof(c1_Hex), 
+    Enc2(pk_Hex, pk_Hex_len, m, strlen(m), w, strlen(w),
+        c1_Hex, sizeof(c1_Hex), 
         c2_Hex, sizeof(c2_Hex), 
         c3_Hex, sizeof(c3_Hex), 
         c4_Hex, sizeof(c4_Hex));
@@ -2070,7 +2071,7 @@ void ReEncTest()
     uint8_t c2_i_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc2(pk_i_Hex, pk_i_Hex_len, m, w, 
+    Enc2(pk_i_Hex, pk_i_Hex_len, m, strlen(m), w, strlen(w),  
         c1_i_Hex, sizeof(c1_i_Hex), 
         c2_i_Hex, sizeof(c2_i_Hex), 
         c3_i_Hex, sizeof(c3_i_Hex), 
