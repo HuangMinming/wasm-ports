@@ -1447,10 +1447,10 @@ export p_reKeyPair to rk1_Hex, rk2_Hex
 ReKeyPair *p_reKeyPair: input, point to the reKeyPair
 uint8_t *rk1_Hex: output, save rk1 with Hex string format in rk1_Hex, should not be NULL
 int rk1_Hex_len: input, indicate the size of rk1_Hex, 
-    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *rk2_Hex: output, save rk2 with Hex string format in rk1_Hex, should not be NULL
+    should be greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *rk2_Hex: output, save rk2 with Hex string format in rk2_Hex, should not be NULL
 int rk2_Hex_len:input, indicate the size of rk2_Hex, 
-    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+    should be greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
 int exportReKeyPair(ReKeyPair *p_reKeyPair, 
     uint8_t *rk1_Hex, int rk1_Hex_len,
@@ -1521,57 +1521,77 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     return 0;
 }
 
+/*
+import p_reKeyPair from rk1_Hex, rk2_Hex
+ReKeyPair *p_reKeyPair: output, point to the reKeyPair
+uint8_t *rk1_Hex: input, retrieve rk1 with Hex string format from rk1_Hex, should not be NULL
+int rk1_Hex_len: input, indicate the size of rk1_Hex, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *rk2_Hex: output, retrieve rk2 with Hex string format from rk2_Hex, should not be NULL
+int rk2_Hex_len:input, indicate the size of rk2_Hex, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+*/
 int importReKeyPair(ReKeyPair *p_reKeyPair, 
     uint8_t *rk1_Hex, int rk1_Hex_len,
     uint8_t *rk2_Hex, int rk2_Hex_len)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********importReKeyPair start************\n");
     printf("********************************\n");
-    if(rk1_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2) ||
-       rk2_Hex_len != (G1_ELEMENT_LENGTH_IN_BYTES * 2)  )
+#endif
+    if( NULL == p_reKeyPair ||
+        NULL == rk1_Hex || rk1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == rk2_Hex || rk2_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
-        printf("rk1_Hex_len = %d, c1_Hex_len should equal to  %d\n", 
-            rk1_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("rk2_Hex_len = %d, c2_Hex_len should equal to  %d\n", 
-            rk2_Hex_len, G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("importReKeyPair input error \n");
         return -1;
     }
 
     //import rk1
     uint8_t rk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, rk1_Hex=\n");
+#ifdef PRINT_DEBUG_INFO
+    printf("importReKeyPair before HexStrToByteStr, rk1_Hex=\n");
     for(int i=0;i<rk1_Hex_len;i++) {
         printf("%c", (unsigned int)rk1_Hex[i]);
     }
     printf("\n");
+#endif
     HexStrToByteStr((uint8_t *)rk1_Hex, rk1_Hex_len, rk1_bytes, sizeof(rk1_bytes));
-    printf("after HexStrToByteStr, c1_bytes=\n");
+#ifdef PRINT_DEBUG_INFO
+    printf("importReKeyPair after HexStrToByteStr, c1_bytes=\n");
     for(int i=0;i<rk1_Hex_len/2;i++) {
         printf("%02x ", rk1_bytes[i]);
     }
     printf("\n");
-
+#endif
     //p_reKeyPair需要在调用importReKeyPair前完成初始化，这样就不用传递pairing
     int rk1_len = element_from_bytes(p_reKeyPair->rk1, (uint8_t *)rk1_bytes);
 
     //import rk2
     uint8_t rk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    printf("before HexStrToByteStr, rk2_Hex=\n");
+#ifdef PRINT_DEBUG_INFO
+    printf("importReKeyPair before HexStrToByteStr, rk2_Hex=\n");
     for(int i=0;i<rk2_Hex_len;i++) {
         printf("%c", (unsigned int)rk2_Hex[i]);
     }
     printf("\n");
+#endif
     HexStrToByteStr((uint8_t *)rk2_Hex, rk2_Hex_len, rk2_bytes, sizeof(rk2_bytes));
-    printf("after HexStrToByteStr, rk2_bytes=\n");
+#ifdef PRINT_DEBUG_INFO
+    printf("importReKeyPair after HexStrToByteStr, rk2_bytes=\n");
     for(int i=0;i<rk2_Hex_len/2;i++) {
         printf("%02x ", rk2_bytes[i]);
     }
     printf("\n");
-
+#endif
     //p_reKeyPair需要在调用importReKeyPair前完成初始化，这样就不用传递pairing
     int rk2_len = element_from_bytes(p_reKeyPair->rk2, (uint8_t *)rk2_bytes);
-
+#ifdef PRINT_DEBUG_INFO
+    printf("********************************\n");
+    printf("**********importReKeyPair end************\n");
+    printf("********************************\n");
+#endif
     return 0;
 }
 
