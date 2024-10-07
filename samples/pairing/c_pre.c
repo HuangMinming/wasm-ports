@@ -1077,23 +1077,24 @@ uint8_t *pk_Hex: input, point to public key Hex string, should not be NULL
 int pk_Hex_len: indicate the size of pk_Hex,
     should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *m_bytes: input, point to the message which need to be encrypt, is a normal string
-int m_byte_len: input, indicate the length of m_bytes, should be equal to SHA256_DIGEST_LENGTH_32
+int m_bytes_len: input, indicate the length of m_bytes, should be equal to SHA256_DIGEST_LENGTH_32
 uint8_t *w:input, point to the condition, is a normal string
 int w_len: input, indicate the length of w, should be greater than 0
-int c1_Hex_len: input, indicate the length of c1_Hex, 
-    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c2_Hex: input, should not be NULL
-int c2_Hex_len: input, indicate the length of c2_Hex, 
-    should equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c3_Hex: input, should not be NULL
-int c3_Hex_len: input, indicate the length of c3_Hex, 
-    should equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
-uint8_t *c4_Hex: input, should not be NULL
-int c4_Hex_len: input, indicate the length of c4_Hex, 
-    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c1_Hex: output, save C1 with Hex string in c1_Hex, should not be NULL
+int c1_Hex_len: input, indicate the size of c1_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_Hex: output, save C2 with Hex string in c2_Hex, should not be NULL
+int c2_Hex_len: input, indicate the size of c2_Hex, 
+    should greater or equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_Hex: output, save C3 with Hex string in c3_Hex, should not be NULL
+int c3_Hex_len: input, indicate the size of c3_Hex, 
+    should greater or equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_Hex: output, save C4 with Hex string in c4_Hex, should not be NULL
+int c4_Hex_len: input, indicate the size of c4_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
 int Enc2(uint8_t *pk_Hex, int pk_Hex_len, 
-    uint8_t *m_bytes, int m_byte_len, 
+    uint8_t *m_bytes, int m_bytes_len, 
     uint8_t *w, int w_len, 
     uint8_t *c1_Hex, int c1_Hex_len,
     uint8_t *c2_Hex, int c2_Hex_len,
@@ -1107,7 +1108,7 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     printf("********************************\n");
 #endif
     if( NULL == pk_Hex || pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
-        NULL == m_bytes || m_byte_len != SHA256_DIGEST_LENGTH_32 ||
+        NULL == m_bytes || m_bytes_len != SHA256_DIGEST_LENGTH_32 ||
         NULL == w || w_len <= 0 ||
         NULL == c1_Hex || c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
         NULL == c2_Hex || c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 ||
@@ -1121,9 +1122,9 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     int iRet = -1;
 
     //先把m_bytes转成bit, 这里会在末尾添加\0，后期可以考虑去掉
-    int m_len = m_byte_len * 8 + 1;
+    int m_len = m_bytes_len * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
-    bytes_to_bits(m_bytes, m_byte_len, m, m_len);
+    bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
     printf("m=%s\n", m);
 
     pairing_t pairing;
@@ -1244,36 +1245,70 @@ int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
     element_init_GT(e2, pairing);
     element_init_G1(hash4result, pairing);
 
+    int iRet = -1;
+
+    if( NULL == p_ciphertext || 
+        NULL == p_ciphertext->c3 )
+    {
+        printf("checkEqual4 input error \n");
+        return -1;
+    }
     
     Hash4(hash4result, p_ciphertext->c1, p_ciphertext->c2, p_ciphertext->c3, SHA256_DIGEST_LENGTH_32 * 8);
     pairing_apply(e1, p_ciphertext->c1, hash4result, pairing);
     pairing_apply(e2, g, p_ciphertext->c4, pairing);
-    if (element_cmp(e1, e2) != 0) 
+    iRet = element_cmp(e1, e2);
+    if (iRet != 0) 
     {
         printf("e(C1, H4(C1,C2,C3)) = e(g, C4) check fail\n");
-        element_clear(hash4result);
-        element_clear(e2);
-        element_clear(e1);
-        return -1;
     }
-    printf("e(C1, H4(C1,C2,C3)) = e(g, C4) check success\n");
-
+    else 
+    {
+        printf("e(C1, H4(C1,C2,C3)) = e(g, C4) check success\n");
+    }
+    
     element_clear(hash4result);
     element_clear(e2);
     element_clear(e1);
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********checkEqual4 end************\n");
     printf("********************************\n");
-    return 0;
+#ifdef PRINT_DEBUG_INFO
+    return iRet;
 }
 
 
 /*
 m_bytes_len = SHA256_DIGEST_LENGTH_32 + 1;
+uint8_t *pk_Hex: input, point to public key Hex string, should not be NULL
+int pk_Hex_len: indicate the size of pk_Hex,
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *sk_Hex: input, point to secret key Hex string, should not be NULL
+int sk_Hex_len: indicate the size of sk_Hex,
+    should be equal to ZR_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *w:input, point to the condition, is a normal string
+int w_len: input, indicate the length of w, should be greater than 0
+uint8_t *c1_Hex: input, retrieve C1 with Hex string from c1_Hex, should not be NULL
+int c1_Hex_len: input, indicate the size of C1, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_Hex: input, retrieve C2 with Hex string from c2_Hex, should not be NULL
+int c2_Hex_len: input, indicate the size of C2, 
+    should be equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_Hex: input, retrieve C3 with Hex string from c3_Hex, should not be NULL 
+int c3_Hex_len: input, indicate the size of C3, 
+    should be equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_Hex: input, retrieve C4 with Hex string from c4_Hex, should not be NULL
+int c4_Hex_len: input, indicate the size of C4, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *m_bytes:output, save m with a '\0', should not be NULL
+int m_bytes_len: input, indicate the size of m_bytes, 
+    should be greater or equal to SHA256_DIGEST_LENGTH_32 + 1
+
 */
 int Dec2(uint8_t *pk_Hex, int pk_Hex_len, 
     uint8_t *sk_Hex, int sk_Hex_len, 
-    uint8_t *w,
+    uint8_t *w, int w_len, 
     uint8_t *c1_Hex, int c1_Hex_len,
     uint8_t *c2_Hex, int c2_Hex_len,
     uint8_t *c3_Hex, int c3_Hex_len,
@@ -1284,14 +1319,19 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     printf("********************************\n");
     printf("**********Dec2 start************\n");
     printf("********************************\n");
-    if(
-       m_bytes_len != (SHA256_DIGEST_LENGTH_32 + 1) 
-       )
+    if( NULL == pk_Hex || pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == sk_Hex || sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == w || w_len <= 0 ||
+        NULL == c1_Hex || c1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == c2_Hex || c2_Hex_len != GT_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == c3_Hex || c3_Hex_len != SHA256_DIGEST_LENGTH_32 * 8 * 2 ||
+        NULL == c4_Hex || c4_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == m_bytes || m_bytes_len < SHA256_DIGEST_LENGTH_32 + 1)
     {
-        printf("m_bytes_len = %d, m_bytes_len should equal to  %d\n", 
-            m_bytes_len, (SHA256_DIGEST_LENGTH_32 + 1));
+        printf("Dec2 input error \n");
         return -1;
     }
+
     int iRet = -1;
 
     pairing_t pairing;
@@ -1311,7 +1351,8 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_GT(ciphertext.c2, pairing);
     element_init_G1(ciphertext.c4, pairing);
     // 为 ciphertext.c3 分配内存
-    ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    int c3_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    ciphertext.c3 = (uint8_t *) malloc(c3_len);
     iRet = importCipherText(&ciphertext, c1_Hex, c1_Hex_len,
         c2_Hex, c2_Hex_len, c3_Hex, c3_Hex_len, 
         c4_Hex, c4_Hex_len);
@@ -1333,32 +1374,26 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_GT(eresult, pairing);
     element_init_GT(R, pairing);
 
-    Hash2(hash2result, keypair.pk, w, strlen((char *)w));
-
-    uint8_t hash2result_bytes[8196];
-    int len = element_to_bytes(hash2result_bytes, hash2result); 
-    printf("hash2result_bytes:\n");
-    for(int i=0;i<len;i++) {
-        printf("%02x ", hash2result_bytes[i]);
-    }
-    printf("\n");
-
-
+    Hash2(hash2result, keypair.pk, w, w_len);
 
     element_pairing(eresult, ciphertext.c1, hash2result);
     element_pow_zn(eresult, eresult, keypair.sk);
     element_invert(eresult, eresult);
     element_mul(R, ciphertext.c2, eresult);
-    uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
-
+    int hash3result_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    uint8_t *hash3result = (uint8_t *) malloc(hash3result_len);
+    Hash3(hash3result, hash3result_len, R);
+#ifdef PRINT_DEBUG_INFO
     printf("hash3result: %s\n",hash3result);
+#endif
 
-
-    uint8_t *m = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    xor_bitstrings(m, ciphertext.c3, SHA256_DIGEST_LENGTH_32 * 8,
-        hash3result, SHA256_DIGEST_LENGTH_32 * 8);
+    int m_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    uint8_t *m = (uint8_t *) malloc(m_len);
+    xor_bitstrings(m, ciphertext.c3, m_len - 1,
+        hash3result, hash3result - 1);
+#ifdef PRINT_DEBUG_INFO
     printf("m=%s\n", m);
+#endif
 
     //verify g^H1(m, R) == C1
     element_t hash1result;
@@ -1367,31 +1402,19 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_t c1_2;
     element_init_G1(c1_2, pairing);
     element_pow_zn(c1_2, g, hash1result);
+    iRet = element_cmp(c1_2, ciphertext.c1);
     if (element_cmp(c1_2, ciphertext.c1) != 0) {
         printf("verify g^H1(m, R) == c1 fail\n");
-        element_clear(c1_2);
-        element_clear(hash1result);
-        free(m);
-        free(hash3result);
-        element_clear(R);	
-        element_clear(eresult);
-        element_clear(hash2result);
-        element_clear(ciphertext.c1);
-        element_clear(ciphertext.c2);
-        free(ciphertext.c3);
-        element_clear(ciphertext.c4);
-        element_clear(keypair.sk);
-        element_clear(keypair.pk);
-        element_clear(Z);
-        element_clear(g);
-        pairing_clear(pairing);	
-        // 处理错误，或返回 ⊥
-        return -1;
     }
-    printf("verify g^H1(m, R) == c1 success\n");
-    bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes, m_bytes_len);
-    printf("m_bytes = %s\n", m_bytes);
- 
+    else 
+    {
+        printf("verify g^H1(m, R) == c1 success\n");
+        bits_to_bytes(m, SHA256_DIGEST_LENGTH_32 * 8, m_bytes, m_bytes_len);
+#ifdef PRINT_DEBUG_INFO
+        printf("m_bytes = %s\n", m_bytes);
+#endif
+    }
+    
     element_clear(c1_2);
     element_clear(hash1result);
     free(m);
@@ -1409,11 +1432,12 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(g);
     pairing_clear(pairing);	
 
-
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********Dec2 end************\n");
     printf("********************************\n");
-    return 0;
+#endif
+    return iRet;
 }
 
 int exportReKeyPair(ReKeyPair *p_reKeyPair, 
@@ -1995,7 +2019,7 @@ void Enc2Test()
 
     uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
     Dec2(pk_Hex, sizeof(pk_Hex), sk_Hex, sizeof(sk_Hex),
-        w, c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
+        w, strlen(w), c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
         m_bytes, sizeof(m_bytes));
     printf("Enc2Test: m_bytes = %s\n", m_bytes);
