@@ -1597,16 +1597,51 @@ int importReKeyPair(ReKeyPair *p_reKeyPair,
     return 0;
 }
 
+/*
+uint8_t *pk_j_Hex: input, point to public key Hex string of j(receriver), 
+    should not be NULL
+int pk_j_Hex_len: indicate the size of pk_j_Hex,
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *sk_i_Hex: input, point to secret key Hex string of i(sender), 
+    should not be NULL
+int sk_i_Hex_len: indicate the size of sk_i_Hex,
+    should be equal to ZR_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *pk_i_Hex: input, point to public key Hex string of i(sender), 
+    should not be NULL
+int pk_i_Hex_len: indicate the size of pk_i_Hex,
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *w:input, point to the condition, is a normal string
+int w_len: input, indicate the length of w, should be greater than 0
+uint8_t *rk1_Hex: output, save rk1 with Hex string format in rk1_Hex, should not be NULL
+int rk1_Hex_len: input, indicate the size of rk1_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *rk2_Hex: output, save rk2 with Hex string format in rk2_Hex, should not be NULL
+int rk2_Hex_len: input, indicate the size of rk2_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+*/
 int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len, 
     uint8_t *sk_i_Hex, int sk_i_Hex_len, 
     uint8_t *pk_i_Hex, int pk_i_Hex_len, 
-    uint8_t *w, 
+    uint8_t *w, int w_len,
     uint8_t *rk1_Hex, int rk1_Hex_len,
     uint8_t *rk2_Hex, int rk2_Hex_len)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********ReKeyGen start************\n");
     printf("********************************\n");
+#endif
+    if( NULL == pk_j_Hex || pk_j_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == sk_i_Hex || sk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == pk_i_Hex || pk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == w || w_len <= 0 ||
+        NULL == rk1_Hex || rk1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == rk2_Hex || rk2_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
+    {
+        printf("ReKeyGen input error \n");
+        return -1;
+    }
+
     int iRet = -1;
 
     pairing_t pairing;
@@ -1636,7 +1671,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_init_Zr(negski, pairing);
     element_init_Zr(s, pairing);
     element_random(s);
-    Hash2(hash2result, keypair_i.pk, w, strlen((char *)w));
+    Hash2(hash2result, keypair_i.pk, w, w_len);
     element_pow_zn(powresult, keypair_j.pk, s);
     element_mul(rk_ij.rk1, hash2result, powresult);
     element_neg(negski, keypair_i.sk);
@@ -1660,13 +1695,17 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_clear(g);
     pairing_clear(pairing);	
 
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********ReKeyGen end************\n");
     printf("********************************\n");
-
+#endif
     return 0;
 }
 
+/*
+reEncrypt c_i to c_j with ReKeyPair rk
+*/
 int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     uint8_t *c2_i_Hex, int c2_i_Hex_len,
     uint8_t *c3_i_Hex, int c3_i_Hex_len,
@@ -2167,7 +2206,7 @@ void ReEncTest()
     uint8_t rk2_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
 
     ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
-            w, rk1_Hex, sizeof(rk1_Hex), rk2_Hex, sizeof(rk2_Hex));
+            w, strlen(w), rk1_Hex, sizeof(rk1_Hex), rk2_Hex, sizeof(rk2_Hex));
 
     uint8_t c1_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_j_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
