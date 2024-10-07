@@ -1049,12 +1049,13 @@ int importCipherText(CipherText *p_ciphertext,
 #endif
     uint8_t c4_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
     HexStrToByteStr((uint8_t *)c4_Hex, c4_Hex_len, c4_bytes, sizeof(c4_bytes));
+#ifdef PRINT_DEBUG_INFO
     printf("importCipherText after HexStrToByteStr, c4_bytes=\n");
     for(int i=0;i<c4_Hex_len/2;i++) {
         printf("%02x ", c4_bytes[i]);
     }
     printf("\n");
-
+#endif
     //ciphertext需要在调用importCipherText前完成初始化，这样就不用传递pairing
     // element_init_G1(ciphertext->c4, pairing); 
     int c4_len = element_from_bytes(p_ciphertext->c4, (uint8_t *)c4_bytes);
@@ -1125,8 +1126,9 @@ int Enc2(uint8_t *pk_Hex, int pk_Hex_len,
     int m_len = m_bytes_len * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
+#ifdef PRINT_DEBUG_INFO
     printf("m=%s\n", m);
-
+#endif
     pairing_t pairing;
     element_t g;
     element_t Z;
