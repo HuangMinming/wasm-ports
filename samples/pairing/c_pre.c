@@ -1755,8 +1755,8 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     printf("********************************\n");
     printf("**********ReEnc start************\n");
     printf("********************************\n");
-    int iRet = -1;
 #endif
+    int iRet = -1;
     pairing_t pairing;
     element_t g;
     element_t Z;
