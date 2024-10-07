@@ -2143,53 +2143,61 @@ void Enc2Test()
     KeyGen(pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
 #ifdef PRINT_DEBUG_INFO
     printf("pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
-    for(int i=0;i<pk_Hex_len;i++) {
-        printf("%c", pk_Hex[i]);
+    for(int i=0;i<pk_Hex_len;) {
+        printf("%c%c ", pk_Hex[i], pk_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
-    for(int i=0;i<sk_Hex_len;i++) {
-        printf("%c", sk_Hex[i]);
+    for(int i=0;i<sk_Hex_len;) {
+        printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
     uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
+    int m_len = strlen(m);
     uint8_t *w=(uint8_t *)"hello world";
+    int w_len = strlen(w);
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc2(pk_Hex, pk_Hex_len, m, strlen(m), w, strlen(w),
+    Enc2(pk_Hex, pk_Hex_len, m, m_len, w, w_len,
         c1_Hex, sizeof(c1_Hex), 
         c2_Hex, sizeof(c2_Hex), 
         c3_Hex, sizeof(c3_Hex), 
         c4_Hex, sizeof(c4_Hex));
 #ifdef PRINT_DEBUG_INFO
     printf("c1:\n");
-    for(int i=0;i<sizeof(c1_Hex);i++) {
-        printf("%c", c1_Hex[i]);
+    for(int i=0;i<sizeof(c1_Hex);) {
+        printf("%c%c ", c1_Hex[i], c1_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("c2:\n");
-    for(int i=0;i<sizeof(c2_Hex);i++) {
-        printf("%c", c2_Hex[i]);
+    for(int i=0;i<sizeof(c2_Hex);) {
+        printf("%c%c ", c2_Hex[i], c2_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("c3:\n");
-    for(int i=0;i<sizeof(c3_Hex);i++) {
-        printf("%c", c3_Hex[i]);
+    for(int i=0;i<sizeof(c3_Hex);) {
+        printf("%c%c ", c3_Hex[i], c3_Hex[i+1]);
+        i += 2;;
     }
     printf("\n");
     printf("c4:\n");
-    for(int i=0;i<sizeof(c4_Hex);i++) {
-        printf("%c", c4_Hex[i]);
+    for(int i=0;i<sizeof(c4_Hex);) {
+        printf("%c%c", c4_Hex[i], c4_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
 
     uint8_t m_bytes[SHA256_DIGEST_LENGTH_32 + 1];
     Dec2(pk_Hex, sizeof(pk_Hex), sk_Hex, sizeof(sk_Hex),
-        w, strlen(w), c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
+        w, w_len, c1_Hex, sizeof(c1_Hex), c2_Hex, sizeof(c2_Hex),
         c3_Hex, sizeof(c3_Hex), c4_Hex, sizeof(c4_Hex),
         m_bytes, sizeof(m_bytes));
     printf("Enc2Test: m_bytes = %s\n", m_bytes);
@@ -2205,13 +2213,15 @@ void Enc1Test()
     KeyGen(pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
 #ifdef PRINT_DEBUG_INFO
     printf("pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
-    for(int i=0;i<pk_Hex_len;i++) {
-        printf("%c", pk_Hex[i]);
+    for(int i=0;i<pk_Hex_len;) {
+        printf("%c%c ", pk_Hex[i], pk_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
-    for(int i=0;i<sk_Hex_len;i++) {
-        printf("%c", sk_Hex[i]);
+    for(int i=0;i<sk_Hex_len;) {
+        printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
@@ -2226,23 +2236,27 @@ void Enc1Test()
         c4_Hex, sizeof(c4_Hex));
 #ifdef PRINT_DEBUG_INFO
     printf("c1:\n");
-    for(int i=0;i<sizeof(c1_Hex);i++) {
-        printf("%c", c1_Hex[i]);
+    for(int i=0;i<sizeof(c1_Hex);) {
+        printf("%c%c ", c1_Hex[i], c1_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("c2:\n");
-    for(int i=0;i<sizeof(c2_Hex);i++) {
-        printf("%c", c2_Hex[i]);
+    for(int i=0;i<sizeof(c2_Hex);) {
+        printf("%c%c ", c2_Hex[i], c2_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("c3:\n");
-    for(int i=0;i<sizeof(c3_Hex);i++) {
-        printf("%c", c3_Hex[i]);
+    for(int i=0;i<sizeof(c3_Hex);) {
+        printf("%c%c", c3_Hex[i], c3_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("c4:\n");
     for(int i=0;i<sizeof(c4_Hex);i++) {
-        printf("%c", c4_Hex[i]);
+        printf("%c%c ", c4_Hex[i], c4_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
