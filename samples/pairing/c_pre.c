@@ -1080,16 +1080,16 @@ uint8_t *m_bytes: input, point to the message which need to be encrypt, is a nor
 int m_bytes_len: input, indicate the length of m_bytes, should be equal to SHA256_DIGEST_LENGTH_32
 uint8_t *w:input, point to the condition, is a normal string
 int w_len: input, indicate the length of w, should be greater than 0
-uint8_t *c1_Hex: output, save C1 with Hex string in c1_Hex, should not be NULL
+uint8_t *c1_Hex: output, save C1 with Hex string format in c1_Hex, should not be NULL
 int c1_Hex_len: input, indicate the size of c1_Hex, 
     should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c2_Hex: output, save C2 with Hex string in c2_Hex, should not be NULL
+uint8_t *c2_Hex: output, save C2 with Hex string format in c2_Hex, should not be NULL
 int c2_Hex_len: input, indicate the size of c2_Hex, 
     should greater or equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c3_Hex: output, save C3 with Hex string in c3_Hex, should not be NULL
+uint8_t *c3_Hex: output, save C3 with Hex string format in c3_Hex, should not be NULL
 int c3_Hex_len: input, indicate the size of c3_Hex, 
     should greater or equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
-uint8_t *c4_Hex: output, save C4 with Hex string in c4_Hex, should not be NULL
+uint8_t *c4_Hex: output, save C4 with Hex string format in c4_Hex, should not be NULL
 int c4_Hex_len: input, indicate the size of c4_Hex, 
     should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
@@ -1289,16 +1289,16 @@ int sk_Hex_len: indicate the size of sk_Hex,
     should be equal to ZR_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *w:input, point to the condition, is a normal string
 int w_len: input, indicate the length of w, should be greater than 0
-uint8_t *c1_Hex: input, retrieve C1 with Hex string from c1_Hex, should not be NULL
+uint8_t *c1_Hex: input, retrieve C1 with Hex string format from c1_Hex, should not be NULL
 int c1_Hex_len: input, indicate the size of C1, 
     should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c2_Hex: input, retrieve C2 with Hex string from c2_Hex, should not be NULL
+uint8_t *c2_Hex: input, retrieve C2 with Hex string format from c2_Hex, should not be NULL
 int c2_Hex_len: input, indicate the size of C2, 
     should be equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
-uint8_t *c3_Hex: input, retrieve C3 with Hex string from c3_Hex, should not be NULL 
+uint8_t *c3_Hex: input, retrieve C3 with Hex string format from c3_Hex, should not be NULL 
 int c3_Hex_len: input, indicate the size of C3, 
     should be equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
-uint8_t *c4_Hex: input, retrieve C4 with Hex string from c4_Hex, should not be NULL
+uint8_t *c4_Hex: input, retrieve C4 with Hex string format from c4_Hex, should not be NULL
 int c4_Hex_len: input, indicate the size of C4, 
     should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *m_bytes:output, save m with a '\0', should not be NULL
@@ -1316,9 +1316,11 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *m_bytes, int m_bytes_len
     )
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********Dec2 start************\n");
     printf("********************************\n");
+#endif
     if( NULL == pk_Hex || pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
         NULL == sk_Hex || sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 ||
         NULL == w || w_len <= 0 ||
@@ -1440,58 +1442,82 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     return iRet;
 }
 
+/*
+export p_reKeyPair to rk1_Hex, rk2_Hex
+ReKeyPair *p_reKeyPair: input, point to the reKeyPair
+uint8_t *rk1_Hex: output, save rk1 with Hex string format in rk1_Hex, should not be NULL
+int rk1_Hex_len: input, indicate the size of rk1_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *rk2_Hex: output, save rk2 with Hex string format in rk1_Hex, should not be NULL
+int rk2_Hex_len:input, indicate the size of rk2_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+*/
 int exportReKeyPair(ReKeyPair *p_reKeyPair, 
-    uint8_t *rk1_Hex, int *p_rk1_Hex_len,
-    uint8_t *rk2_Hex, int *p_rk2_Hex_len)
+    uint8_t *rk1_Hex, int rk1_Hex_len,
+    uint8_t *rk2_Hex, int rk2_Hex_len)
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********exportReKeyPair start************\n");
     printf("********************************\n");
-    size_t sk1_len = element_length_in_bytes(p_reKeyPair->rk1);
-    size_t sk2_len = element_length_in_bytes(p_reKeyPair->rk2);
-    if (sk1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
-        sk2_len != G1_ELEMENT_LENGTH_IN_BYTES)
+#endif
+    if( NULL == p_reKeyPair ||
+        NULL == rk1_Hex || rk1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == rk2_Hex || rk2_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
-        printf("sk1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", sk1_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("sk2_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", sk2_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("exportReKeyPair input error \n");
+        return -1;
+    }
+
+    size_t rk1_len = element_length_in_bytes(p_reKeyPair->rk1);
+    size_t rk2_len = element_length_in_bytes(p_reKeyPair->rk2);
+    if (rk1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
+        rk2_len != G1_ELEMENT_LENGTH_IN_BYTES)
+    {
+        printf("rk1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", rk1_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("rk2_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", rk2_len, G1_ELEMENT_LENGTH_IN_BYTES);
         printf("exit \n");
         return -1;
     }
     
-    uint8_t sk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
-    uint8_t sk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t rk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
+    uint8_t rk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 
-    sk1_len = element_to_bytes(sk1_bytes, p_reKeyPair->rk1);
-    sk2_len = element_to_bytes(sk2_bytes, p_reKeyPair->rk2);
-
-    ByteStrToHexStr(sk1_bytes, sk1_len, rk1_Hex, sk1_len * 2);
-    ByteStrToHexStr(sk2_bytes, sk2_len, rk2_Hex, sk2_len * 2);
-    printf("sk1_len = %d, sk1_bytes=\n", sk1_len);
-    for(int i=0;i<sk1_len;i++){
-        printf("%02x ", sk1_bytes[i]);
+    rk1_len = element_to_bytes(rk1_bytes, p_reKeyPair->rk1);
+    rk2_len = element_to_bytes(rk2_bytes, p_reKeyPair->rk2);
+#ifdef PRINT_DEBUG_INFO
+    printf("exportReKeyPair before ByteStrToHexStr rk1_len = %d, sk1_bytes=\n", rk1_len);
+    for(int i=0;i<rk1_len;i++){
+        printf("%02x ", rk1_bytes[i]);
     }
     printf("\n");
-    printf("sk2_len = %d, sk2_bytes=\n", sk2_len);
-    for(int i=0;i<sk2_len;i++){
-        printf("%02x ", sk2_bytes[i]);
+    printf("exportReKeyPair before ByteStrToHexStr rk2_len = %d, rk2_bytes=\n", rk2_len);
+    for(int i=0;i<rk2_len;i++){
+        printf("%02x ", rk2_bytes[i]);
     }
     printf("\n");
-    (*p_rk1_Hex_len) = sk1_len * 2;
-    (*p_rk2_Hex_len) = sk2_len * 2;
+#endif
 
-    printf("(*p_rk1_Hex_len) = %d, rk1_Hex=\n", (*p_rk1_Hex_len));
-    for(int i=0;i<(*p_rk1_Hex_len);i++) {
-        printf("%c", rk1_Hex[i]);
+    ByteStrToHexStr(rk1_bytes, rk1_len, rk1_Hex, rk1_Hex_len);
+    ByteStrToHexStr(rk2_bytes, rk2_len, rk2_Hex, rk2_Hex_len);
+
+#ifdef PRINT_DEBUG_INFO
+    printf("exportReKeyPair after ByteStrToHexStr rk1_Hex_len = %d, rk1_Hex=\n", rk1_Hex_len);
+    for(int i=0;i<rk1_Hex_len;) {
+        printf("%c%c ", rk1_Hex[i], rk1_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
-    printf("(*p_rk2_Hex_len) = %d, rk2_Hex=\n", (*p_rk2_Hex_len));
-    for(int i=0;i<(*p_rk2_Hex_len);i++) {
-        printf("%c", rk2_Hex[i]);
+    printf("exportReKeyPair after ByteStrToHexStr rk2_Hex_len = %d, rk2_Hex=\n", rk2_Hex_len);
+    for(int i=0;i<rk2_Hex_len;) {
+        printf("%c%c ", rk2_Hex[i], rk2_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
     printf("********************************\n");
     printf("**********exportReKeyPair end************\n");
     printf("********************************\n");
+#endif
     return 0;
 }
 
