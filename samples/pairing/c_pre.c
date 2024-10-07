@@ -1864,26 +1864,47 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
 
 //m,w是以\0结束的字符串，代码中使用strlen()确定实际长度
 //m是AES-GCM key，长度是256bit，32字节
+/*
+uint8_t *pk_Hex: input, point to public key Hex string, should not be NULL
+int pk_Hex_len: indicate the size of pk_Hex,
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *m_bytes: input, point to the message which need to be encrypt, is a normal string
+int m_bytes_len: input, indicate the length of m_bytes, should be equal to SHA256_DIGEST_LENGTH_32
+uint8_t *c1_Hex: output, save C1 with Hex string format in c1_Hex, should not be NULL
+int c1_Hex_len: input, indicate the size of c1_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_Hex: output, save C2 with Hex string format in c2_Hex, should not be NULL
+int c2_Hex_len: input, indicate the size of c2_Hex, 
+    should greater or equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_Hex: output, save C3 with Hex string format in c3_Hex, should not be NULL
+int c3_Hex_len: input, indicate the size of c3_Hex, 
+    should greater or equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_Hex: output, save C4 with Hex string format in c4_Hex, should not be NULL
+int c4_Hex_len: input, indicate the size of c4_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+*/
 int Enc1(uint8_t *pk_Hex, int pk_Hex_len, 
-    uint8_t *m_bytes,
+    uint8_t *m_bytes, int m_bytes_len, 
     uint8_t *c1_Hex, int c1_Hex_len, 
     uint8_t *c2_Hex, int c2_Hex_len, 
     uint8_t *c3_Hex, int c3_Hex_len, 
     uint8_t *c4_Hex, int c4_Hex_len
     )
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********Enc1 start************\n");
     printf("********************************\n");
-
+#endif
     int iRet = -1;
 
     //先把m_bytes转成bit
-    int m_len = strlen((const char *)m_bytes) * 8 + 1;
+    int m_len = m_bytes_len * 8 + 1;
     uint8_t *m = (uint8_t *)malloc(m_len);
-    bytes_to_bits(m_bytes, strlen((const char *)m_bytes), m, m_len);
+    bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
+#ifdef PRINT_DEBUG_INFO
     printf("m=%s\n", m);
-
+#endif
     pairing_t pairing;
     element_t g;
     element_t Z;
@@ -1905,7 +1926,8 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_init_G1(ciphertext.c4, pairing);
 
     // 为 ciphertext.c3 分配内存
-    ciphertext.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    int c3_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    ciphertext.c3 = (uint8_t *) malloc(c3_len);
 
     element_t R, r, s0, eresult, emuls;
     element_init_GT(R, pairing);
@@ -1922,10 +1944,11 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_pairing(eresult, g, keypair.pk);
     element_pow_zn(eresult, eresult, emuls);
     element_mul(ciphertext.c2, R, eresult);
-    uint8_t *hash3result = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
-    Hash3(hash3result, SHA256_DIGEST_LENGTH_32 * 8 + 1, R);
-    xor_bitstrings(ciphertext.c3, m, SHA256_DIGEST_LENGTH_32 * 8,
-        hash3result, SHA256_DIGEST_LENGTH_32 * 8);
+    int hash3result_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    uint8_t *hash3result = (uint8_t *) malloc(hash3result_len);
+    Hash3(hash3result, hash3result_len, R);
+    xor_bitstrings(ciphertext.c3, m, m_len - 1,
+        hash3result, hash3result_len - 1);
     element_pow_zn(ciphertext.c4, g, s0);
 
     //export ciphertext
@@ -1950,10 +1973,11 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     element_clear(g);
     pairing_clear(pairing);	
 
-
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********Enc1 end************\n");
     printf("********************************\n");
+#endif
     return 0;
 }
 
@@ -2159,7 +2183,7 @@ void Enc1Test()
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc1(pk_Hex, pk_Hex_len, m, c1_Hex, sizeof(c1_Hex), 
+    Enc1(pk_Hex, pk_Hex_len, m, strlen(m), c1_Hex, sizeof(c1_Hex), 
         c2_Hex, sizeof(c2_Hex), 
         c3_Hex, sizeof(c3_Hex), 
         c4_Hex, sizeof(c4_Hex));
