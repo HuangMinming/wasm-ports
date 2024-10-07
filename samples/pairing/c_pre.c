@@ -1614,10 +1614,10 @@ uint8_t *w:input, point to the condition, is a normal string
 int w_len: input, indicate the length of w, should be greater than 0
 uint8_t *rk1_Hex: output, save rk1 with Hex string format in rk1_Hex, should not be NULL
 int rk1_Hex_len: input, indicate the size of rk1_Hex, 
-    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+    should be greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 uint8_t *rk2_Hex: output, save rk2 with Hex string format in rk2_Hex, should not be NULL
 int rk2_Hex_len: input, indicate the size of rk2_Hex, 
-    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+    should be greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
 int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len, 
     uint8_t *sk_i_Hex, int sk_i_Hex_len, 
@@ -1705,6 +1705,39 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
 
 /*
 reEncrypt c_i to c_j with ReKeyPair rk
+
+uint8_t *c1_i_Hex: input, should not be NULL
+int c1_i_Hex_len: input, indicate the length of c1_i_Hex, 
+    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_i_Hex: input, should not be NULL
+int c2_i_Hex_len: input, indicate the length of c2_i_Hex, 
+    should equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_i_Hex: input, should not be NULL
+int c3_i_Hex_len: input, indicate the length of c3_i_Hex, 
+    should equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_i_Hex: input, should not be NULL
+int c4_i_Hex_len: input, indicate the length of c4_i_Hex, 
+    should equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+
+uint8_t *rk1_Hex: input, retrieve rk1 with Hex string format from rk1_Hex, should not be NULL
+int rk1_Hex_len: input, indicate the size of rk1_Hex, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *rk2_Hex: input, retrieve rk2 with Hex string format from rk2_Hex, should not be NULL
+int rk2_Hex_len: input, indicate the size of rk2_Hex, 
+    should be equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+
+uint8_t *c1_j_Hex: output, save C1 with Hex string format in c1_j_Hex, should not be NULL
+int c1_j_Hex_len: input, indicate the size of c1_j_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c2_Hex: output, save C2 with Hex string format in c2_j_Hex, should not be NULL
+int c2_j_Hex_len: input, indicate the size of c2_j_Hex, 
+    should greater or equal to GT_ELEMENT_LENGTH_IN_BYTES * 2
+uint8_t *c3_j_Hex: output, save C3 with Hex string format in c3_j_Hex, should not be NULL
+int c3_j_Hex_len: input, indicate the size of c3_j_Hex, 
+    should greater or equal to SHA256_DIGEST_LENGTH_32 * 8 * 2
+uint8_t *c4_j_Hex: output, save C4 with Hex string format in c4_j_Hex, should not be NULL
+int c4_j_Hex_len: input, indicate the size of c4_j_Hex, 
+    should greater or equal to G1_ELEMENT_LENGTH_IN_BYTES * 2
 */
 int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     uint8_t *c2_i_Hex, int c2_i_Hex_len,
@@ -1718,11 +1751,12 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     uint8_t *c4_j_Hex, int c4_j_Hex_len
     )
 {
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********ReEnc start************\n");
     printf("********************************\n");
     int iRet = -1;
-
+#endif
     pairing_t pairing;
     element_t g;
     element_t Z;
@@ -1739,7 +1773,8 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_init_GT(CT_i.c2, pairing);
     element_init_G1(CT_i.c4, pairing);
     // 为 ciphertext.c3 分配内存
-    CT_i.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    int c3_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
+    CT_i.c3 = (uint8_t *) malloc(c3_len);
     iRet = importCipherText(&CT_i, c1_i_Hex, c1_i_Hex_len,
         c2_i_Hex, c2_i_Hex_len, c3_i_Hex, c3_i_Hex_len, 
         c4_i_Hex, c4_i_Hex_len);
@@ -1757,7 +1792,7 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_init_GT(CT_j.c2, pairing);
     element_init_G1(CT_j.c4, pairing);
     // 为 ciphertext.c3 分配内存
-    CT_j.c3 = (uint8_t *) malloc(SHA256_DIGEST_LENGTH_32 * 8 + 1);
+    CT_j.c3 = (uint8_t *) malloc(c3_len);
 
     
     iRet = checkEqual4(pairing, g, &CT_i);
@@ -1791,24 +1826,17 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_mul(CT_j.c2, CT_i.c2, pairing3);
 
     // C̄3 = C3 (复制第三部分)
-    strcpy((char *)CT_j.c3, (char *)CT_i.c3);
+    memcpy(CT_j.c3, CT_i.c3, c3_len);
+    // strcpy((char *)CT_j.c3, (char *)CT_i.c3);
 
     // C̄4 = rk2
     element_set(CT_j.c4, rk_ij.rk2);
 
-
-    iRet = exportCipherText(&CT_j, c1_j_Hex, c1_j_Hex_len, 
+    exportCipherText(&CT_j, c1_j_Hex, c1_j_Hex_len, 
         c2_j_Hex, c2_j_Hex_len, 
         c3_j_Hex, c3_j_Hex_len, 
         c4_j_Hex, c4_j_Hex_len);
-    if(iRet != 0) 
-    {
-        printf("checkEqual4 fail, return %d\n", iRet);
-    }
-    else 
-    {
-        printf("checkEqual4 success\n");
-    }
+    
 
     element_clear(pairing3);
     element_clear(CT_j.c1);
@@ -1824,19 +1852,13 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     element_clear(Z);
     element_clear(g);
     pairing_clear(pairing);	
-
+#ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
     printf("**********ReEnc end************\n");
     printf("********************************\n");
-
-    if(iRet != 0) 
-    {
-        return -1;
-    }
-    else 
-    {
-        return 0;
-    }
+#endif
+    
+    return iRet;
     
 }
 
