@@ -1632,7 +1632,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     printf("********************************\n");
 #endif
     if( NULL == pk_j_Hex || pk_j_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
-        NULL == sk_i_Hex || sk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
+        NULL == sk_i_Hex || sk_i_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 ||
         NULL == pk_i_Hex || pk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
         NULL == w || w_len <= 0 ||
         NULL == rk1_Hex || rk1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 ||
