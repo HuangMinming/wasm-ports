@@ -1552,8 +1552,9 @@ int importReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t rk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 #ifdef PRINT_DEBUG_INFO
     printf("importReKeyPair before HexStrToByteStr, rk1_Hex=\n");
-    for(int i=0;i<rk1_Hex_len;i++) {
-        printf("%c", (unsigned int)rk1_Hex[i]);
+    for(int i=0;i<rk1_Hex_len;) {
+        printf("%c%c ", rk1_Hex[i], rk1_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
@@ -1572,8 +1573,9 @@ int importReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t rk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 #ifdef PRINT_DEBUG_INFO
     printf("importReKeyPair before HexStrToByteStr, rk2_Hex=\n");
-    for(int i=0;i<rk2_Hex_len;i++) {
-        printf("%c", (unsigned int)rk2_Hex[i]);
+    for(int i=0;i<rk2_Hex_len;) {
+        printf("%c", rk2_Hex[i], rk2_Hex[i+1]);
+        i += 2;
     }
     printf("\n");
 #endif
