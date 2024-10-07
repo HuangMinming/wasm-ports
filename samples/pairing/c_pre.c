@@ -1274,7 +1274,7 @@ int checkEqual4(pairing_t pairing, element_t g, CipherText *p_ciphertext)
     printf("********************************\n");
     printf("**********checkEqual4 end************\n");
     printf("********************************\n");
-#ifdef PRINT_DEBUG_INFO
+#endif
     return iRet;
 }
 
