@@ -1390,7 +1390,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     int m_len = SHA256_DIGEST_LENGTH_32 * 8 + 1;
     uint8_t *m = (uint8_t *) malloc(m_len);
     xor_bitstrings(m, ciphertext.c3, m_len - 1,
-        hash3result, hash3result - 1);
+        hash3result, hash3result_len - 1);
 #ifdef PRINT_DEBUG_INFO
     printf("m=%s\n", m);
 #endif
