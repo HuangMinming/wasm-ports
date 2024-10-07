@@ -1408,7 +1408,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     Hash3(hash3result, hash3result_len, R);
 #ifdef PRINT_DEBUG_INFO
     printf("Dec2 hash3result: \n",hash3result);
-    for(int i=0;i<hash3result_len;) 
+    for(int i=0;i<hash3result_len - 1;) 
     {
         printf("%c%c ", hash3result[i], hash3result[i + 1]);
         i += 2;
@@ -2220,7 +2220,7 @@ void Enc2Test()
     printf("\n");
     printf("Enc2Test c4:\n");
     for(int i=0;i<sizeof(c4_Hex);) {
-        printf("%c%c", c4_Hex[i], c4_Hex[i+1]);
+        printf("%c%c ", c4_Hex[i], c4_Hex[i+1]);
         i += 2;
     }
     printf("\n");
