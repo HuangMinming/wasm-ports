@@ -1579,8 +1579,8 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     uint8_t *sk_i_Hex, int sk_i_Hex_len, 
     uint8_t *pk_i_Hex, int pk_i_Hex_len, 
     uint8_t *w, 
-    uint8_t *rk1_Hex, int *p_rk1_Hex_len,
-    uint8_t *rk2_Hex, int *p_rk2_Hex_len)
+    uint8_t *rk1_Hex, int rk1_Hex_len,
+    uint8_t *rk2_Hex, int rk2_Hex_len)
 {
     printf("********************************\n");
     printf("**********ReKeyGen start************\n");
@@ -1622,7 +1622,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     element_pow_zn(rk_ij.rk2, keypair_i.pk, s);
 
     //convert rk_ij to Hex
-    exportReKeyPair(&rk_ij, rk1_Hex, p_rk1_Hex_len, rk2_Hex, p_rk2_Hex_len);
+    exportReKeyPair(&rk_ij, rk1_Hex, rk1_Hex_len, rk2_Hex, rk2_Hex_len);
 
 
     element_clear(negski);
@@ -2143,11 +2143,9 @@ void ReEncTest()
 
     uint8_t rk1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t rk2_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    int rk1_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
-    int rk2_Hex_len = G1_ELEMENT_LENGTH_IN_BYTES * 2;
 
     ReKeyGen(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
-            w, rk1_Hex, &rk1_Hex_len, rk2_Hex, &rk2_Hex_len);
+            w, rk1_Hex, sizeof(rk1_Hex), rk2_Hex, sizeof(rk2_Hex));
 
     uint8_t c1_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_j_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
