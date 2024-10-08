@@ -1507,8 +1507,10 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     if (rk1_len != G1_ELEMENT_LENGTH_IN_BYTES ||
         rk2_len != G1_ELEMENT_LENGTH_IN_BYTES)
     {
-        printf("rk1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", rk1_len, G1_ELEMENT_LENGTH_IN_BYTES);
-        printf("rk2_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", rk2_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("exportReKeyPair rk1_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            rk1_len, G1_ELEMENT_LENGTH_IN_BYTES);
+        printf("exportReKeyPair rk2_len = %d, G1_ELEMENT_LENGTH_IN_BYTES = %d\n", 
+            rk2_len, G1_ELEMENT_LENGTH_IN_BYTES);
         printf("exit \n");
         return -1;
     }
@@ -1516,8 +1518,8 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     uint8_t rk1_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
     uint8_t rk2_bytes[G1_ELEMENT_LENGTH_IN_BYTES];
 
-    rk1_len = element_to_bytes(rk1_bytes, p_reKeyPair->rk1);
-    rk2_len = element_to_bytes(rk2_bytes, p_reKeyPair->rk2);
+    element_to_bytes(rk1_bytes, p_reKeyPair->rk1);
+    element_to_bytes(rk2_bytes, p_reKeyPair->rk2);
 #ifdef PRINT_DEBUG_INFO
     printf("exportReKeyPair before ByteStrToHexStr rk1_len = %d, sk1_bytes=\n", rk1_len);
     for(int i=0;i<rk1_len;i++){
@@ -1683,7 +1685,7 @@ int ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
     iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
-        printf("Setup return %d, exit", iRet);
+        printf("ReKeyGen Setup return %d, exit", iRet);
         return -1;
     }
 
@@ -1796,7 +1798,7 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
-        printf("Setup return %d, exit", iRet);
+        printf("ReEnc Setup return %d, exit", iRet);
         return -1;
     }
 
@@ -1831,7 +1833,7 @@ int ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
     iRet = checkEqual4(pairing, g, &CT_i);
     if(iRet != 0) 
     {
-        printf("checkEqual4 return %d, exit", iRet);
+        printf("ReEnc checkEqual4 return %d, exit", iRet);
         element_clear(CT_j.c1);
         element_clear(CT_j.c2);
         free(CT_j.c3);
@@ -1936,7 +1938,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == c3_Hex || c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 ||
         NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
-        printf("Enc2 input error \n");
+        printf("Enc1 input error \n");
         return -1;
     }
     int iRet = -1;
@@ -1946,7 +1948,13 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
 #ifdef PRINT_DEBUG_INFO
-    printf("m=%s\n", m);
+    printf("Enc1 m=\n", m);
+    for(int i=0;i<m_len-1;)
+    {
+        printf("%c%c ", m[i], m[i+1]);
+        i += 2;
+    }
+    printf("\n");
 #endif
     pairing_t pairing;
     element_t g;
@@ -1955,7 +1963,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
-        printf("Setup return %d, exit", iRet);
+        printf("Enc1 Setup return %d, exit", iRet);
         return -1;
     }
 
@@ -2083,7 +2091,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
     iRet = Setup(pairing, g, Z);
     if(iRet != 0) 
     {
-        printf("Setup return %d, exit", iRet);
+        printf("Dec1 Setup return %d, exit", iRet);
         return -1;
     }
 
@@ -2138,7 +2146,7 @@ int Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         printf("Dec1 verify g^H1(m, R) == c1 success\n");
         bits_to_bytes(m, m_len - 1, m_bytes, m_bytes_len);
 #ifdef PRINT_DEBUG_INFO
-        printf("m_bytes = %s\n", m_bytes);
+        printf("Dec1 m_bytes = %s\n", m_bytes);
 #endif
     }
 
@@ -2186,9 +2194,9 @@ void Enc2Test()
     }
     printf("\n");
 #endif
-    uint8_t *m=(uint8_t *)"12345678901234567890123456789012";
+    uint8_t *m=(uint8_t *)"ab3456789012345678901234567890cd";
     int m_len = strlen(m);
-    uint8_t *w=(uint8_t *)"hello world";
+    uint8_t *w=(uint8_t *)"hello world000";
     int w_len = strlen(w);
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
@@ -2243,48 +2251,49 @@ void Enc1Test()
 
     KeyGen(pk_Hex, pk_Hex_len, sk_Hex, sk_Hex_len);
 #ifdef PRINT_DEBUG_INFO
-    printf("pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
+    printf("Enc1Test pk_Hex_len = %d, pk_Hex=\n", pk_Hex_len);
     for(int i=0;i<pk_Hex_len;) {
         printf("%c%c ", pk_Hex[i], pk_Hex[i+1]);
         i += 2;
     }
     printf("\n");
-    printf("sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
+    printf("Enc1Test sk_Hex_len = %d, sk_Hex=\n", sk_Hex_len);
     for(int i=0;i<sk_Hex_len;) {
         printf("%c%c ", sk_Hex[i], sk_Hex[i+1]);
         i += 2;
     }
     printf("\n");
 #endif
-    uint8_t *m=(uint8_t *)"abcdefghijklmnopqrstuvwxyz123456";
+    uint8_t *m=(uint8_t *)"01cdefghijklmnopqrstuvwxyz123456";
+    int m_len = strlen(m);
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc1(pk_Hex, pk_Hex_len, m, strlen(m), c1_Hex, sizeof(c1_Hex), 
+    Enc1(pk_Hex, pk_Hex_len, m, m_len, c1_Hex, sizeof(c1_Hex), 
         c2_Hex, sizeof(c2_Hex), 
         c3_Hex, sizeof(c3_Hex), 
         c4_Hex, sizeof(c4_Hex));
 #ifdef PRINT_DEBUG_INFO
-    printf("c1:\n");
+    printf("Enc1Test c1:\n");
     for(int i=0;i<sizeof(c1_Hex);) {
         printf("%c%c ", c1_Hex[i], c1_Hex[i+1]);
         i += 2;
     }
     printf("\n");
-    printf("c2:\n");
+    printf("Enc1Test c2:\n");
     for(int i=0;i<sizeof(c2_Hex);) {
         printf("%c%c ", c2_Hex[i], c2_Hex[i+1]);
         i += 2;
     }
     printf("\n");
-    printf("c3:\n");
+    printf("Enc1Test c3:\n");
     for(int i=0;i<sizeof(c3_Hex);) {
         printf("%c%c", c3_Hex[i], c3_Hex[i+1]);
         i += 2;
     }
     printf("\n");
-    printf("c4:\n");
+    printf("Enc1Test c4:\n");
     for(int i=0;i<sizeof(c4_Hex);i++) {
         printf("%c%c ", c4_Hex[i], c4_Hex[i+1]);
         i += 2;
@@ -2311,13 +2320,15 @@ void ReEncTest()
     int sk_i_Hex_len = sizeof(sk_i_Hex);
     KeyGen(pk_i_Hex, pk_i_Hex_len, sk_i_Hex, sk_i_Hex_len);
 
-    uint8_t *m=(uint8_t *)"abcdefghij1234567890123456789012";
-    uint8_t *w=(uint8_t *)"hello world";
+    uint8_t *m=(uint8_t *)"89cdefghij12345678901234567890ab";
+    uint8_t *w=(uint8_t *)"hello world111";
+    int m_len = strlen(m);
+    int w_len = strlen(w);
     uint8_t c1_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_i_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
     uint8_t c4_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
-    Enc2(pk_i_Hex, pk_i_Hex_len, m, strlen(m), w, strlen(w),  
+    Enc2(pk_i_Hex, pk_i_Hex_len, m, m_len, w, w_len,  
         c1_i_Hex, sizeof(c1_i_Hex), 
         c2_i_Hex, sizeof(c2_i_Hex), 
         c3_i_Hex, sizeof(c3_i_Hex), 
@@ -2368,15 +2379,15 @@ int main() {
     printf("=============\n");
     Enc2Test();
 
-    // printf("=============\n");
-    // printf("=======Enc1Test======\n");
-    // printf("=============\n");
-    // Enc1Test();
+    printf("=============\n");
+    printf("=======Enc1Test======\n");
+    printf("=============\n");
+    Enc1Test();
 
-    // printf("=============\n");
-    // printf("=======ReEncTest=====\n");
-    // printf("=============\n");
-    // ReEncTest();
+    printf("=============\n");
+    printf("=======ReEncTest=====\n");
+    printf("=============\n");
+    ReEncTest();
     
 
 
