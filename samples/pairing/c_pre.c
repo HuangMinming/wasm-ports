@@ -752,7 +752,10 @@ uint8_t *sk_Hex: output, should not be null,
 int sk_Hex_len: input, indicate the size of sk_Hex, 
         should greater or equal than ZR_ELEMENT_LENGTH_IN_BYTES * 2
 */
-int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
+// #ifdef __cplusplus
+// extern "C" {
+// #endif
+int EMSCRIPTEN_KEEPALIVE KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
 {
 #ifdef PRINT_DEBUG_INFO
     printf("********************************\n");
@@ -825,6 +828,10 @@ int KeyGen(uint8_t *pk_Hex, int pk_Hex_len, uint8_t *sk_Hex, int sk_Hex_len)
 #endif
     return iRet;
 }
+
+// #ifdef __cplusplus
+// }
+// #endif
 
 /*
 export p_ciphertext to c1_Hex, c2_Hex, c3_Hex, c4_Hex in Hex string format
