@@ -1408,7 +1408,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *hash3result = (uint8_t *) malloc(hash3result_len);
     Hash3(hash3result, hash3result_len, R);
 #ifdef PRINT_DEBUG_INFO
-    printf("Dec2 hash3result: \n",hash3result);
+    printf("Dec2 hash3result: \n");
     for(int i=0;i<hash3result_len;) 
     {
         printf("%c%c ", hash3result[i], hash3result[i + 1]);
@@ -1422,7 +1422,7 @@ int Dec2(uint8_t *pk_Hex, int pk_Hex_len,
     xor_bitstrings(m, ciphertext.c3, c3_len,
         hash3result, hash3result_len);
 #ifdef PRINT_DEBUG_INFO
-    printf("Dec2 m=\n", m);
+    printf("Dec2 m=\n");
     for(int i=0;i<m_len;) 
     {
         printf("%c%c ", m[i], m[i + 1]);
@@ -1964,7 +1964,7 @@ int Enc1(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
 #ifdef PRINT_DEBUG_INFO
-    printf("Enc1 m=\n", m);
+    printf("Enc1 m=\n");
     for(int i=0;i<m_len;)
     {
         printf("%c%c ", m[i], m[i+1]);
@@ -2211,9 +2211,9 @@ void Enc2Test()
     printf("\n");
 #endif
     uint8_t *m=(uint8_t *)"ab3456789012345678901234567890cd";
-    int m_len = strlen(m);
+    int m_len = strlen((char *)m);
     uint8_t *w=(uint8_t *)"hello world000";
-    int w_len = strlen(w);
+    int w_len = strlen((char *)w);
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
@@ -2289,7 +2289,7 @@ void Enc1Test()
     printf("\n");
 #endif
     uint8_t *m=(uint8_t *)"01cdefghijklmnopqrstuvwxyz123456";
-    int m_len = strlen(m);
+    int m_len = strlen((char *)m);
     uint8_t c1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
@@ -2351,8 +2351,8 @@ void ReEncTest()
 
     uint8_t *m=(uint8_t *)"89cdefghij12345678901234567890ab";
     uint8_t *w=(uint8_t *)"hello world111";
-    int m_len = strlen(m);
-    int w_len = strlen(w);
+    int m_len = strlen((char *)m);
+    int w_len = strlen((char *)w);
     uint8_t c1_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c2_i_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
     uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
