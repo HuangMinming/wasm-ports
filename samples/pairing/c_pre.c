@@ -1338,6 +1338,34 @@ int EMSCRIPTEN_KEEPALIVE Enc2(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("Enc2 input error \n");
+        printf("NULL == pk_Hex %d", 
+            NULL == pk_Hex);
+        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+            pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("NULL == m_bytes %d", 
+            NULL == m_bytes);
+        printf("m_bytes_len != SHA256_DIGEST_LENGTH_32 %d", 
+            m_bytes_len != SHA256_DIGEST_LENGTH_32);
+        printf("NULL == w %d", 
+            NULL == w);
+        printf("w_len <= 0", 
+            w_len <= 0);
+        printf("NULL == c1_Hex %d", 
+            NULL == c1_Hex);
+        printf("c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+            c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("NULL == c2_Hex %d", 
+            NULL == c2_Hex);
+        printf("c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+            c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2);
+        printf("NULL == c3_Hex %d", 
+            NULL == c3_Hex);
+        printf("c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 %d", 
+            c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2);
+        printf("NULL == c4_Hex %d", 
+            NULL == c4_Hex);
+        printf("c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+            c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2);
         return -1;
     }
 
