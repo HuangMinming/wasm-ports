@@ -1338,33 +1338,33 @@ int EMSCRIPTEN_KEEPALIVE Enc2(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("Enc2 input error \n");
-        printf("NULL == pk_Hex %d", 
+        printf("NULL == pk_Hex %d\n", 
             NULL == pk_Hex);
-        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 %d\n", 
             pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("NULL == m_bytes %d", 
+        printf("NULL == m_bytes %d\n", 
             NULL == m_bytes);
-        printf("m_bytes_len != SHA256_DIGEST_LENGTH_32 %d", 
+        printf("m_bytes_len != SHA256_DIGEST_LENGTH_32 %d\n", 
             m_bytes_len != SHA256_DIGEST_LENGTH_32);
-        printf("NULL == w %d", 
+        printf("NULL == w %d\n", 
             NULL == w);
-        printf("w_len <= 0", 
+        printf("w_len <= 0 %d\n", 
             w_len <= 0);
-        printf("NULL == c1_Hex %d", 
+        printf("NULL == c1_Hex %d\n", 
             NULL == c1_Hex);
-        printf("c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+        printf("c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d\n", 
             c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("NULL == c2_Hex %d", 
+        printf("NULL == c2_Hex %d\n", 
             NULL == c2_Hex);
-        printf("c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+        printf("c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 %d\n", 
             c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2);
-        printf("NULL == c3_Hex %d", 
+        printf("NULL == c3_Hex %d\n", 
             NULL == c3_Hex);
-        printf("c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 %d", 
+        printf("c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 %d\n", 
             c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2);
-        printf("NULL == c4_Hex %d", 
+        printf("NULL == c4_Hex %d\n", 
             NULL == c4_Hex);
-        printf("c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d", 
+        printf("c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 %d\n", 
             c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2);
         return -1;
     }
