@@ -2173,7 +2173,12 @@ int EMSCRIPTEN_KEEPALIVE Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         printf("Dec1 verify g^H1(m, R) == c1 success\n");
         bits_to_bytes(m, m_len, m_bytes, m_bytes_len);
 #ifdef PRINT_DEBUG_INFO
-        printf("Dec1 m_bytes = %s\n", m_bytes);
+        printf("Dec1 m_bytes =\n", m_bytes);
+        for(int i=0;i<m_bytes_len;i++)
+        {
+            printf("%c", m_bytes[i]);
+        }
+        print("\n");
 #endif
     }
 
