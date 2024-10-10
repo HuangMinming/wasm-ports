@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
 #include <pbc/pbc.h>
 #include <string.h>
 #include "sha256.h"
@@ -2241,6 +2242,11 @@ int EMSCRIPTEN_KEEPALIVE Dec1(uint8_t *pk_Hex, int pk_Hex_len,
 // #ifdef __cplusplus
 // }
 // #endif
+
+EMSCRIPTEN_BINDINGS(my_module) {
+	constant("SHA256_DIGEST_LENGTH_32", SHA256_DIGEST_LENGTH_32);
+	constant("ZR_ELEMENT_LENGTH_IN_BYTES", ZR_ELEMENT_LENGTH_IN_BYTES);
+}
 
 void Enc2Test()
 {
