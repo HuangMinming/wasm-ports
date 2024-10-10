@@ -1087,7 +1087,7 @@ int exportReKeyPair(ReKeyPair *p_reKeyPair,
     element_to_bytes(rk1_bytes, p_reKeyPair->rk1);
     element_to_bytes(rk2_bytes, p_reKeyPair->rk2);
 #ifdef PRINT_DEBUG_INFO
-    printf("exportReKeyPair before ByteStrToHexStr rk1_len = %d, sk1_bytes=\n", rk1_len);
+    printf("exportReKeyPair before ByteStrToHexStr rk1_len = %d, rk1_bytes=\n", rk1_len);
     for(int i=0;i<rk1_len;i++){
         printf("%02x ", rk1_bytes[i]);
     }
