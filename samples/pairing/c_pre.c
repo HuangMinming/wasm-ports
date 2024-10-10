@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <emscripten/emscripten.h>
-#include <emscripten/bind.h>
 #include <pbc/pbc.h>
 #include <string.h>
 #include "sha256.h"
@@ -1345,32 +1344,24 @@ int EMSCRIPTEN_KEEPALIVE Enc2(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("Enc2 input error \n");
-        printf("NULL == pk_Hex %d\n", 
-            NULL == pk_Hex);
+        printf("NULL == pk_Hex = %d\n", NULL == pk_Hex);
         printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_Hex_len = %d\n", 
             pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_Hex_len);
-        printf("NULL == m_bytes %d\n", 
-            NULL == m_bytes);
+        printf("NULL == m_bytes = %d\n", NULL == m_bytes);
         printf("m_bytes_len != SHA256_DIGEST_LENGTH_32 = %d, m_bytes_len = %d\n", 
             m_bytes_len != SHA256_DIGEST_LENGTH_32, m_bytes_len);
-        printf("NULL == w %d\n", 
-            NULL == w);
-        printf("w_len <= 0 %d, w_len = %d\n", 
-            w_len <= 0, w_len);
-        printf("NULL == c1_Hex = %d\n", 
-            NULL == c1_Hex);
+        printf("NULL == w = %d\n", NULL == w);
+        printf("w_len <= 0 = %d, w_len = %d\n", w_len <= 0, w_len);
+        printf("NULL == c1_Hex = %d\n", NULL == c1_Hex);
         printf("c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_Hex_len = %d\n", 
             c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_Hex_len);
-        printf("NULL == c2_Hex = %d\n", 
-            NULL == c2_Hex);
+        printf("NULL == c2_Hex = %d\n", NULL == c2_Hex);
         printf("c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_Hex_len = %d\n", 
             c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2, c2_Hex_len);
-        printf("NULL == c3_Hex %d\n", 
-            NULL == c3_Hex);
+        printf("NULL == c3_Hex = %d\n", NULL == c3_Hex);
         printf("c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 = %d, c3_Hex_len = %d\n", 
             c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2, c3_Hex_len);
-        printf("NULL == c4_Hex %d\n", 
-            NULL == c4_Hex);
+        printf("NULL == c4_Hex = %d\n", NULL == c4_Hex);
         printf("c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_Hex_len = %d\n", 
             c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_Hex_len);
         return -1;
@@ -1555,6 +1546,29 @@ int EMSCRIPTEN_KEEPALIVE Dec2(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == m_bytes || m_bytes_len < SHA256_DIGEST_LENGTH_32)
     {
         printf("Dec2 input error \n");
+        printf("NULL == pk_Hex = %d\n", NULL == pk_Hex);
+        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_Hex_len = %d\n", 
+            pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_Hex_len);
+        printf("NULL == sk_Hex = %d\n", NULL == sk_Hex);
+        printf("sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 = %d, sk_Hex_len = %d\n", 
+            sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2, sk_Hex_len);
+        printf("NULL == w = %d\n", NULL == w);
+        printf("w_len <= 0 = %d, w_len = %d\n", w_len <= 0, w_len);
+        printf("NULL == c1_Hex = %d\n", NULL == c1_Hex);
+        printf("c1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_Hex_len = %d\n", 
+            c1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_Hex_len);
+        printf("NULL == c2_Hex = %d\n", NULL == c2_Hex);
+        printf("c2_Hex_len != GT_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_Hex_len = %d\n", 
+            c2_Hex_len != GT_ELEMENT_LENGTH_IN_BYTES * 2, c2_Hex_len);
+        printf("NULL == c3_Hex = %d\n", NULL == c3_Hex);
+        printf("c3_Hex_len != SHA256_DIGEST_LENGTH_32 * 8 * 2 = %d, c3_Hex_len = %d\n", 
+            c3_Hex_len != SHA256_DIGEST_LENGTH_32 * 8 * 2, c3_Hex_len);
+        printf("NULL == c4_Hex = %d\n", NULL == c4_Hex);
+        printf("c4_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_Hex_len = %d\n", 
+            c4_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_Hex_len);
+        printf("NULL == m_bytes = %d\n", NULL == m_bytes);
+        printf("m_bytes_len < SHA256_DIGEST_LENGTH_32 = %d, m_bytes_len = %d\n", 
+            m_bytes_len < SHA256_DIGEST_LENGTH_32, m_bytes_len);
         return -1;
     }
 
@@ -1721,6 +1735,23 @@ int EMSCRIPTEN_KEEPALIVE ReKeyGen(uint8_t *pk_j_Hex, int pk_j_Hex_len,
         NULL == rk2_Hex || rk2_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("ReKeyGen input error \n");
+        printf("NULL == pk_j_Hex = %d\n", NULL == pk_j_Hex);
+        printf("pk_j_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_j_Hex_len = %d\n", 
+            pk_j_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_j_Hex_len);
+        printf("NULL == sk_i_Hex = %d\n", NULL == sk_i_Hex);
+        printf("sk_i_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 = %d, sk_i_Hex_len = %d\n", 
+            sk_i_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2, sk_i_Hex_len);
+        printf("NULL == pk_i_Hex = %d\n", NULL == pk_i_Hex);
+        printf("pk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_i_Hex_len = %d\n", 
+            pk_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_i_Hex_len);
+        printf("NULL == w = %d\n", NULL == w);
+        printf("w_len <= 0 = %d, w_len = %d\n", w_len <= 0, w_len);
+        printf("NULL == rk1_Hex = %d\n", NULL == rk1_Hex);
+        printf("rk1_Hex_len <= G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, rk1_Hex_len = %d\n", 
+            rk1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, rk1_Hex_len);
+        printf("NULL == rk2_Hex = %d\n", NULL == rk2_Hex);
+        printf("rk2_Hex_len <= G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, rk2_Hex_len = %d\n", 
+            rk2_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, rk2_Hex_len);
         return -1;
     }
 
@@ -1850,6 +1881,37 @@ int EMSCRIPTEN_KEEPALIVE ReEnc(uint8_t *c1_i_Hex, int c1_i_Hex_len,
         NULL == c4_j_Hex || c4_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("ReKeyGen input error \n");
+        printf("NULL == c1_i_Hex = %d\n", NULL == c1_i_Hex);
+        printf("c1_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_i_Hex_len = %d\n", 
+            c1_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_i_Hex_len);
+        printf("NULL == c2_i_Hex = %d\n", NULL == c2_i_Hex);
+        printf("c2_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_i_Hex_len = %d\n", 
+            c2_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c2_i_Hex_len);
+        printf("NULL == c3_i_Hex = %d\n", NULL == c3_i_Hex);
+        printf("c3_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c3_i_Hex_len = %d\n", 
+            c3_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c3_i_Hex_len);
+        printf("NULL == c4_i_Hex = %d\n", NULL == c4_i_Hex);
+        printf("c4_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_i_Hex_len = %d\n", 
+            c4_i_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_i_Hex_len);
+        printf("NULL == rk1_Hex = %d\n", NULL == rk1_Hex);
+        printf("rk1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, rk1_Hex_len = %d\n", 
+            rk1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, rk1_Hex_len);
+        printf("NULL == rk2_Hex = %d\n", NULL == rk2_Hex);
+        printf("rk2_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, rk2_Hex_len = %d\n", 
+            rk2_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, rk2_Hex_len);
+        printf("NULL == c1_j_Hex = %d\n", NULL == c1_j_Hex);
+        printf("c1_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_j_Hex_len = %d\n", 
+            c1_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_j_Hex_len);
+        printf("NULL == c2_j_Hex = %d\n", NULL == c2_j_Hex);
+        printf("c2_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_j_Hex_len = %d\n", 
+            c2_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c2_j_Hex_len);
+        printf("NULL == c3_j_Hex = %d\n", NULL == c3_j_Hex);
+        printf("c3_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c3_j_Hex_len = %d\n", 
+            c3_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c3_j_Hex_len);
+        printf("NULL == c4_j_Hex = %d\n", NULL == c4_j_Hex);
+        printf("c4_j_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_j_Hex_len = %d\n", 
+            c4_j_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_j_Hex_len);
+        
         return -1;
     }
 
@@ -2001,6 +2063,24 @@ int EMSCRIPTEN_KEEPALIVE Enc1(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == c4_Hex || c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2)
     {
         printf("Enc1 input error \n");
+        printf("NULL == pk_Hex = %d\n", NULL == pk_Hex);
+        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_Hex_len = %d\n", 
+            pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_Hex_len);
+        printf("NULL == m_bytes = %d\n", NULL == m_bytes);
+        printf("m_bytes_len != SHA256_DIGEST_LENGTH_32 = %d, m_bytes_len = %d\n", 
+            m_bytes_len != SHA256_DIGEST_LENGTH_32, m_bytes_len);
+        printf("NULL == c1_Hex = %d\n", NULL == c1_Hex);
+        printf("c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_Hex_len = %d\n", 
+            c1_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_Hex_len);
+        printf("NULL == c2_Hex = %d\n", NULL == c2_Hex);
+        printf("c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_Hex_len = %d\n", 
+            c2_Hex_len < GT_ELEMENT_LENGTH_IN_BYTES * 2, c2_Hex_len);
+        printf("NULL == c3_Hex = %d\n", NULL == c3_Hex);
+        printf("c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2 = %d, c3_Hex_len = %d\n", 
+            c3_Hex_len < SHA256_DIGEST_LENGTH_32 * 8 * 2, c3_Hex_len);
+        printf("NULL == c4_Hex = %d\n", NULL == c4_Hex);
+        printf("c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_Hex_len = %d\n", 
+            c4_Hex_len < G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_Hex_len);
         return -1;
     }
     int iRet = -1;
@@ -2142,6 +2222,27 @@ int EMSCRIPTEN_KEEPALIVE Dec1(uint8_t *pk_Hex, int pk_Hex_len,
         NULL == m_bytes || m_bytes_len < SHA256_DIGEST_LENGTH_32)
     {
         printf("Dec1 input error \n");
+        printf("NULL == pk_Hex = %d\n", NULL == pk_Hex);
+        printf("pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, pk_Hex_len = %d\n", 
+            pk_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, pk_Hex_len);
+        printf("NULL == sk_Hex = %d\n", NULL == sk_Hex);
+        printf("sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2 = %d, sk_Hex_len = %d\n", 
+            sk_Hex_len != ZR_ELEMENT_LENGTH_IN_BYTES * 2, sk_Hex_len);
+        printf("NULL == c1_Hex = %d\n", NULL == c1_Hex);
+        printf("c1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c1_Hex_len = %d\n", 
+            c1_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c1_Hex_len);
+        printf("NULL == c2_Hex = %d\n", NULL == c2_Hex);
+        printf("c2_Hex_len != GT_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c2_Hex_len = %d\n", 
+            c2_Hex_len != GT_ELEMENT_LENGTH_IN_BYTES * 2, c2_Hex_len);
+        printf("NULL == c3_Hex = %d\n", NULL == c3_Hex);
+        printf("c3_Hex_len != SHA256_DIGEST_LENGTH_32 * 8 * 2 = %d, c3_Hex_len = %d\n", 
+            c3_Hex_len != SHA256_DIGEST_LENGTH_32 * 8 * 2, c3_Hex_len);
+        printf("NULL == c4_Hex = %d\n", NULL == c4_Hex);
+        printf("c4_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2 = %d, c4_Hex_len = %d\n", 
+            c4_Hex_len != G1_ELEMENT_LENGTH_IN_BYTES * 2, c4_Hex_len);
+        printf("NULL == m_bytes = %d\n", NULL == m_bytes);
+        printf("m_bytes_len < SHA256_DIGEST_LENGTH_32 = %d, m_bytes_len = %d\n", 
+            m_bytes_len < SHA256_DIGEST_LENGTH_32, m_bytes_len);
         return -1;
     }
     int iRet = -1;
@@ -2243,10 +2344,6 @@ int EMSCRIPTEN_KEEPALIVE Dec1(uint8_t *pk_Hex, int pk_Hex_len,
 // }
 // #endif
 
-EMSCRIPTEN_BINDINGS(my_module) {
-	constant("SHA256_DIGEST_LENGTH_32", SHA256_DIGEST_LENGTH_32);
-	constant("ZR_ELEMENT_LENGTH_IN_BYTES", ZR_ELEMENT_LENGTH_IN_BYTES);
-}
 
 void Enc2Test()
 {

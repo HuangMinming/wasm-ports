@@ -22,3 +22,4 @@ emcc c_pre.o sha256.o -s WASM=1 -lff -lpbc -lgmp -I $EMSCRIPTEN/system/include -
 
 emcc c_pre.o sha256.o -s WASM=1 -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js -s NO_EXIT_RUNTIME=0
 emcc c_pre.o sha256.o -s WASM=1 -lpbc -lgmp -I $EMSCRIPTEN/system/include -o c_pre.js -s EXPORTED_FUNCTIONS='["_Enc1Test", "_Enc2Test", "_ReEncTest", "_KeyGen", "_Enc2", "_Dec2", "_ReKeyGen", "_ReEnc", "_Enc1", "_Dec1", "_malloc", "_free"]' -s EXPORTED_RUNTIME_METHODS='["ccall","cwrap", "UTF8ToString", "allocate", "allocateUTF8"]' -s MODULARIZE=1 -s NO_EXIT_RUNTIME=0
+
