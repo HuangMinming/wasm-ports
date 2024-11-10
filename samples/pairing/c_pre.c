@@ -2565,22 +2565,23 @@ void ReEncTest()
 
 int main() {
 
-    printf("=============\n");
-    printf("=======Enc2Test======\n");
-    printf("=============\n");
-    Enc2Test();
+    printf("main start\n");
+    // printf("=============\n");
+    // printf("=======Enc2Test======\n");
+    // printf("=============\n");
+    // Enc2Test();
 
-    printf("=============\n");
-    printf("=======Enc1Test======\n");
-    printf("=============\n");
-    Enc1Test();
+    // printf("=============\n");
+    // printf("=======Enc1Test======\n");
+    // printf("=============\n");
+    // Enc1Test();
 
-    printf("=============\n");
-    printf("=======ReEncTest=====\n");
-    printf("=============\n");
-    ReEncTest();
+    // printf("=============\n");
+    // printf("=======ReEncTest=====\n");
+    // printf("=============\n");
+    // ReEncTest();
     
 
-
+    printf("main end\n");
     return 0;
 }
