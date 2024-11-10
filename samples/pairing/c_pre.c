@@ -2565,7 +2565,7 @@ void ReEncTest()
 
 int main() {
 
-    printf("main start\n");
+    // printf("main start\n");
     // printf("=============\n");
     // printf("=======Enc2Test======\n");
     // printf("=============\n");
@@ -2582,6 +2582,6 @@ int main() {
     // ReEncTest();
     
 
-    printf("main end\n");
+    // printf("main end\n");
     return 0;
 }
