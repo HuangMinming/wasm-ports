@@ -2571,10 +2571,10 @@ int main() {
     printf("=============\n");
     Enc2Test();
 
-    // printf("=============\n");
-    // printf("=======Enc1Test======\n");
-    // printf("=============\n");
-    // Enc1Test();
+    printf("=============\n");
+    printf("=======Enc1Test======\n");
+    printf("=============\n");
+    Enc1Test();
 
     // printf("=============\n");
     // printf("=======ReEncTest=====\n");
