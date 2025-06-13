@@ -913,7 +913,7 @@ int importCipherText(CipherText *p_ciphertext,
     //import c2
 #ifdef PRINT_DEBUG_INFO
     printf("importCipherText before HexStrToByteStr, c2_Hex=\n");
-    for(int i=0;i<c2_Hex_len;i++) {
+    for(int i=0;i<c2_Hex_len;) {
         printf("%c%c ", c2_Hex[i], c2_Hex[i+1]);
         i += 2;
     }
