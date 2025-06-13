@@ -2565,11 +2565,11 @@ void ReEncTest()
 
 int main() {
 
-    // printf("main start\n");
-    // printf("=============\n");
-    // printf("=======Enc2Test======\n");
-    // printf("=============\n");
-    // Enc2Test();
+    printf("main start\n");
+    printf("=============\n");
+    printf("=======Enc2Test======\n");
+    printf("=============\n");
+    Enc2Test();
 
     // printf("=============\n");
     // printf("=======Enc1Test======\n");
