@@ -2851,7 +2851,7 @@ void ReEncTest2()
     memcpy(sk_i_Hex, "2bc7881c4cd1dd9eaaf79682b41e53c2662e4149", ZR_ELEMENT_LENGTH_IN_BYTES * 2);
     
 
-    uint8_t *m=(uint8_t *)"1234567890ABCDEF09876543D21FEDCBA";
+    uint8_t *m=(uint8_t *)"1234567890ABCDEF0987654321FEDCBA";
     uint8_t *w=(uint8_t *)"136test24.txt";
     int m_len = strlen((char *)m);
     int w_len = strlen((char *)w);
