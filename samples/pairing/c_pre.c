@@ -1547,6 +1547,13 @@ int EMSCRIPTEN_KEEPALIVE Enc2_debug(uint8_t *pk_Hex, int pk_Hex_len,
     uint8_t *m = (uint8_t *)malloc(m_len);
     bytes_to_bits(m_bytes, m_bytes_len, m, m_len);
 #ifdef PRINT_DEBUG_INFO
+    printf("Enc2_debug m_bytes=\n");
+    for(int i=0;i<m_bytes_len;)
+    {
+        printf("%c%c ", m_bytes[i], m_bytes[i+1]);
+        i += 2;
+    }
+    printf("\n");
     printf("Enc2_debug m=\n");
     for(int i=0;i<m_len;)
     {
