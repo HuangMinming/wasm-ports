@@ -2839,6 +2839,78 @@ void ReEncTest()
 
 }
 
+void ReEncTest2() 
+{
+    //start to test ReKeyGen
+    uint8_t pk_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t sk_i_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
+    int pk_i_Hex_len = sizeof(pk_i_Hex);
+    int sk_i_Hex_len = sizeof(sk_i_Hex);
+    // KeyGen(pk_i_Hex, pk_i_Hex_len, sk_i_Hex, sk_i_Hex_len);
+    memcpy(pk_i_Hex, "6552d0097d1d726d863af0a3a2931d6e13e7e9f8368fac45044ec0437ff2965a337fafbb719b7180dc95b5cef48f823b4e5ecb11113c660c17369403836fbd216b7442d061f0f818cfee493f2f5bf0a2e9bc2bc648003e2ec1f4072c74ebde12cc5cf0901024e3d01f902222bc0c49453af20cd5eae3c3d0e0c5678856cb66b8", G1_ELEMENT_LENGTH_IN_BYTES * 2);
+    memcpy(sk_i_Hex, "2bc7881c4cd1dd9eaaf79682b41e53c2662e4149", ZR_ELEMENT_LENGTH_IN_BYTES * 2);
+    
+
+    uint8_t *m=(uint8_t *)"89cdefghij12345678901234567890ab";
+    uint8_t *w=(uint8_t *)"136test24.txt";
+    int m_len = strlen((char *)m);
+    int w_len = strlen((char *)w);
+    uint8_t c1_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_i_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_i_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_i_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    Enc2_debug(pk_i_Hex, pk_i_Hex_len, m, m_len, w, w_len,  
+        c1_i_Hex, sizeof(c1_i_Hex), 
+        c2_i_Hex, sizeof(c2_i_Hex), 
+        c3_i_Hex, sizeof(c3_i_Hex), 
+        c4_i_Hex, sizeof(c4_i_Hex));
+
+    uint8_t pk_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t sk_j_Hex[ZR_ELEMENT_LENGTH_IN_BYTES * 2];
+    int pk_j_Hex_len = sizeof(pk_j_Hex);
+    int sk_j_Hex_len = sizeof(sk_j_Hex);
+    // KeyGen(pk_j_Hex, pk_j_Hex_len, sk_j_Hex, sk_j_Hex_len);
+    memcpy(pk_j_Hex, "6552d0097d1d726d863af0a3a2931d6e13e7e9f8368fac45044ec0437ff2965a337fafbb719b7180dc95b5cef48f823b4e5ecb11113c660c17369403836fbd216b7442d061f0f818cfee493f2f5bf0a2e9bc2bc648003e2ec1f4072c74ebde12cc5cf0901024e3d01f902222bc0c49453af20cd5eae3c3d0e0c5678856cb66b8", G1_ELEMENT_LENGTH_IN_BYTES * 2);
+    memcpy(sk_j_Hex, "2bc7881c4cd1dd9eaaf79682b41e53c2662e4149", ZR_ELEMENT_LENGTH_IN_BYTES * 2);
+    
+
+
+    uint8_t rk1_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t rk2_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+
+    ReKeyGen_debug(pk_j_Hex, pk_j_Hex_len, sk_i_Hex, sk_i_Hex_len, pk_i_Hex, pk_i_Hex_len, 
+            w, w_len, rk1_Hex, sizeof(rk1_Hex), rk2_Hex, sizeof(rk2_Hex));
+
+    uint8_t c1_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c2_j_Hex[GT_ELEMENT_LENGTH_IN_BYTES * 2];
+    uint8_t c3_j_Hex[SHA256_DIGEST_LENGTH_32 * 8 * 2];
+    uint8_t c4_j_Hex[G1_ELEMENT_LENGTH_IN_BYTES * 2];
+
+    ReEnc(c1_i_Hex, sizeof(c1_i_Hex), 
+        c2_i_Hex, sizeof(c2_i_Hex),
+        c3_i_Hex, sizeof(c3_i_Hex),
+        c4_i_Hex, sizeof(c4_i_Hex),
+        rk1_Hex, sizeof(rk1_Hex),
+        rk2_Hex, sizeof(rk2_Hex),
+        c1_j_Hex, sizeof(c1_j_Hex),
+        c2_j_Hex, sizeof(c2_j_Hex),
+        c3_j_Hex, sizeof(c3_j_Hex),
+        c4_j_Hex, sizeof(c4_j_Hex));
+    
+    uint8_t m_bytes[SHA256_DIGEST_LENGTH_32];
+    Dec1(pk_j_Hex, sizeof(pk_j_Hex), sk_j_Hex, sizeof(sk_j_Hex),
+        c1_j_Hex, sizeof(c1_j_Hex), c2_j_Hex, sizeof(c2_j_Hex),
+        c3_j_Hex, sizeof(c3_j_Hex), c4_j_Hex, sizeof(c4_j_Hex),
+        m_bytes, sizeof(m_bytes));
+    printf("ReEncTest: m_bytes = \n");
+    for(int i=0;i<sizeof(m_bytes);i++)
+    {
+        printf("%c", m_bytes[i]);
+    }
+    printf("\n");
+
+}
+
 int main() {
 
     // printf("main start\n");
@@ -2857,6 +2929,10 @@ int main() {
     // printf("=============\n");
     // ReEncTest();
     
+    printf("=============\n");
+    printf("=======ReEncTest2=====\n");
+    printf("=============\n");
+    ReEncTest2();
 
     // printf("main end\n");
     return 0;
